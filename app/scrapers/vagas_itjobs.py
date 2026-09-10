@@ -23,6 +23,19 @@ logger = logging.getLogger(__name__)
 
 ITJOBS_SEARCH_URL = "https://api.itjobs.pt/job/search.json"
 
+# Alguns servidores (incluindo os runners do GitHub Actions) bloqueiam pedidos
+# com o user-agent por omissão da biblioteca requests ("python-requests/x.y")
+# por ser um sinal típico de robôs — por isso identificamo-nos como um
+# pedido normal de browser, tal como qualquer pessoa a usar a API a partir
+# de casa.
+CABECALHOS_PEDIDO = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json",
+}
+
 
 def _termos_pesquisa() -> list[str]:
     # "or", não o 2º argumento do .get(): uma Variable do GitHub Actions por
@@ -48,7 +61,9 @@ def procurar_vagas(termo: str, api_key: str, pagina: int = 1, limite: int = 50) 
     if locations:
         parametros["location"] = ",".join(locations)
 
-    resposta = requests.get(ITJOBS_SEARCH_URL, params=parametros, timeout=20)
+    resposta = requests.get(
+        ITJOBS_SEARCH_URL, params=parametros, headers=CABECALHOS_PEDIDO, timeout=20
+    )
     resposta.raise_for_status()
     return resposta.json()
 
