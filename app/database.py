@@ -8,6 +8,7 @@ fica escrita no código nem no repositório. Localmente define-a num ficheiro
 """
 import os
 
+import certifi
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -28,7 +29,12 @@ def get_client() -> MongoClient:
                 "de .env.example (localmente) ou define o secret MONGODB_URI "
                 "no GitHub Actions / variável de ambiente no Render."
             )
-        _client = MongoClient(uri)
+        # tlsCAFile=certifi.where(): usa um conjunto de certificados-raiz
+        # atualizado em vez do do sistema operativo. Sem isto, ligar ao Atlas
+        # a partir de alguns runners Linux (como o do GitHub Actions) falha o
+        # handshake TLS com "TLSV1_ALERT_INTERNAL_ERROR" — problema conhecido,
+        # nada a ver com a connection string em si.
+        _client = MongoClient(uri, tlsCAFile=certifi.where())
     return _client
 
 
