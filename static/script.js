@@ -85,14 +85,48 @@ async function atualizarEstadoVaga(vagaId, novoEstado, elementoEtiqueta) {
     }
 }
 
+function preencherOpcoes(seletor, valores) {
+    const atual = seletor.value;
+    // remove todas as opções exceto a primeira ("Todos/Todas...")
+    while (seletor.options.length > 1) {
+        seletor.remove(1);
+    }
+    valores.forEach((valor) => {
+        const opcao = document.createElement('option');
+        opcao.value = valor;
+        opcao.textContent = valor;
+        seletor.appendChild(opcao);
+    });
+    // mantém a seleção anterior se ainda for válida
+    if (valores.includes(atual)) {
+        seletor.value = atual;
+    }
+}
+
+async function carregarOpcoesVagas() {
+    try {
+        const opcoes = await pedirJSON('/api/opcoes/vagas');
+        preencherOpcoes(document.getElementById('filtroLocalizacaoVagas'), opcoes.localizacoes);
+        preencherOpcoes(document.getElementById('filtroTermoVagas'), opcoes.termos_origem);
+    } catch (erro) {
+        console.error('Não foi possível carregar as opções de filtro das vagas', erro);
+    }
+}
+
 async function carregarVagas() {
     const lista = document.getElementById('listaVagas');
     const texto = document.getElementById('filtroTextoVagas').value.trim();
     const estado = document.getElementById('filtroEstadoVagas').value;
+    const localizacao = document.getElementById('filtroLocalizacaoVagas').value;
+    const termoOrigem = document.getElementById('filtroTermoVagas').value;
+    const periodo = document.getElementById('filtroPeriodoVagas').value;
 
     const parametros = new URLSearchParams();
     if (texto) parametros.set('texto', texto);
     if (estado) parametros.set('estado', estado);
+    if (localizacao) parametros.set('localizacao', localizacao);
+    if (termoOrigem) parametros.set('termo_origem', termoOrigem);
+    if (periodo) parametros.set('periodo', periodo);
 
     try {
         const vagas = await pedirJSON(`/api/vagas?${parametros.toString()}`);
@@ -132,12 +166,25 @@ function construirCartaoNoticia(noticia) {
     return cartao;
 }
 
+async function carregarOpcoesNoticias() {
+    try {
+        const opcoes = await pedirJSON('/api/opcoes/noticias');
+        preencherOpcoes(document.getElementById('filtroFonteNoticias'), opcoes.fontes);
+    } catch (erro) {
+        console.error('Não foi possível carregar as opções de filtro das notícias', erro);
+    }
+}
+
 async function carregarNoticias() {
     const lista = document.getElementById('listaNoticias');
     const texto = document.getElementById('filtroTextoNoticias').value.trim();
+    const fonte = document.getElementById('filtroFonteNoticias').value;
+    const periodo = document.getElementById('filtroPeriodoNoticias').value;
 
     const parametros = new URLSearchParams();
     if (texto) parametros.set('texto', texto);
+    if (fonte) parametros.set('fonte', fonte);
+    if (periodo) parametros.set('periodo', periodo);
 
     try {
         const noticias = await pedirJSON(`/api/noticias?${parametros.toString()}`);
@@ -186,13 +233,20 @@ function comAtraso(fn, atrasoMs = 300) {
 function configurarFiltros() {
     document.getElementById('filtroTextoVagas').addEventListener('input', comAtraso(carregarVagas));
     document.getElementById('filtroEstadoVagas').addEventListener('change', carregarVagas);
+    document.getElementById('filtroLocalizacaoVagas').addEventListener('change', carregarVagas);
+    document.getElementById('filtroTermoVagas').addEventListener('change', carregarVagas);
+    document.getElementById('filtroPeriodoVagas').addEventListener('change', carregarVagas);
     document.getElementById('filtroTextoNoticias').addEventListener('input', comAtraso(carregarNoticias));
+    document.getElementById('filtroFonteNoticias').addEventListener('change', carregarNoticias);
+    document.getElementById('filtroPeriodoNoticias').addEventListener('change', carregarNoticias);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     configurarAbas();
     configurarFiltros();
     carregarResumo();
+    carregarOpcoesVagas();
+    carregarOpcoesNoticias();
     carregarVagas();
     carregarNoticias();
 });
