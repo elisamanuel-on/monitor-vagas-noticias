@@ -64,6 +64,9 @@ def listar_vagas(
     termo_origem: Optional[str] = Query(
         None, description="Filtrar pelo termo de pesquisa que encontrou a vaga"
     ),
+    fonte: Optional[str] = Query(
+        None, description="Filtrar pela fonte da vaga (ex: ITJobs, Landing.jobs, Net-Empregos)"
+    ),
     periodo: Optional[str] = Query(
         None, description="Filtrar por data de publicação: '24h', '7d' ou '30d'"
     ),
@@ -81,6 +84,8 @@ def listar_vagas(
         filtro["localizacoes"] = localizacao
     if termo_origem:
         filtro["termo_origem"] = termo_origem
+    if fonte:
+        filtro["fonte"] = fonte
     cutoff = _cutoff_por_periodo(periodo)
     if cutoff:
         filtro["publicado_em"] = {"$gte": cutoff}
@@ -96,7 +101,8 @@ def opcoes_vagas():
     colecao = get_vagas_collection()
     localizacoes = sorted({loc for loc in colecao.distinct("localizacoes") if loc})
     termos_origem = sorted({t for t in colecao.distinct("termo_origem") if t})
-    return {"localizacoes": localizacoes, "termos_origem": termos_origem}
+    fontes = sorted({f for f in colecao.distinct("fonte") if f})
+    return {"localizacoes": localizacoes, "termos_origem": termos_origem, "fontes": fontes}
 
 
 @app.patch("/api/vagas/{vaga_id}")

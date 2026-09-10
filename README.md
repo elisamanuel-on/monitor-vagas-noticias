@@ -2,7 +2,10 @@
 
 Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
-- **Vagas de emprego reais** — via [API oficial da ITJobs](https://www.itjobs.pt/api), filtradas por área/termos de pesquisa.
+- **Vagas de emprego reais**, de três fontes diferentes, todas filtradas pelas mesmas palavras-chave (`VAGAS_QUERY`):
+  - [API oficial da ITJobs](https://www.itjobs.pt/api) — vagas de tecnologia em Portugal.
+  - [API pública do Landing.jobs](https://landing.jobs) — vagas de tecnologia na Europa.
+  - [Feed RSS do Net-Empregos](https://www.net-empregos.com/rssfeed.asp) — o maior portal de emprego generalista de Portugal (filtrado localmente, porque o feed cobre todos os setores).
 - **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) — via feed RSS de pesquisa do Google Notícias.
 
 Tudo fica guardado em **MongoDB Atlas** e servido por uma API em **FastAPI**, com um frontend próprio em HTML/CSS/JS puro.
@@ -21,8 +24,11 @@ app/
   database.py          # ligação ao MongoDB (lê MONGODB_URI do ambiente)
   models.py            # schemas Pydantic
   scrapers/
-    vagas_itjobs.py    # recolhe vagas reais da API da ITJobs
-    noticias_rss.py    # recolhe notícias reais via RSS
+    vagas_itjobs.py        # recolhe vagas reais da API da ITJobs
+    vagas_landing_jobs.py  # recolhe vagas reais da API pública do Landing.jobs
+    vagas_netempregos.py   # recolhe vagas reais do feed RSS do Net-Empregos
+    noticias_rss.py        # recolhe notícias reais via RSS
+    utils.py                # configuração partilhada (VAGAS_QUERY) entre as fontes de vagas
 scripts/
   run_scrapers.py      # ponto de entrada usado pelo GitHub Actions (e para correr à mão)
 static/                # frontend (HTML/CSS/JS puro, sem framework)
@@ -50,6 +56,8 @@ Os dois robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são inde
 ### 2. API key da ITJobs (gratuita)
 
 Em [itjobs.pt/api](https://www.itjobs.pt/api), preenche só o teu email — a chave (de leitura) chega logo.
+
+O Landing.jobs (API pública) e o Net-Empregos (feed RSS) **não precisam de chave nenhuma** — já funcionam sem configuração extra.
 
 ### 3. Variáveis de ambiente
 

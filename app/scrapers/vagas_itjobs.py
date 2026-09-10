@@ -86,6 +86,7 @@ def _para_documento(vaga_api: dict, termo_origem: str) -> dict:
         "link": f"https://www.itjobs.pt/oferta/{vaga_api['id']}",
         "publicado_em": publicado_em,
         "termo_origem": termo_origem,
+        "fonte": "ITJobs",
     }
 
 

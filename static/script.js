@@ -51,6 +51,7 @@ function construirCartaoVaga(vaga) {
     etiqueta.dataset.estado = vaga.estado;
 
     cartao.querySelector('.cartao-vaga-empresa').textContent = vaga.empresa;
+    cartao.querySelector('.etiqueta-fonte').textContent = vaga.fonte || 'Fonte não indicada';
 
     const localizacoes = (vaga.localizacoes || []).join(', ') || 'Localização não indicada';
     const salario = vaga.salario_min && vaga.salario_max
@@ -108,6 +109,7 @@ async function carregarOpcoesVagas() {
         const opcoes = await pedirJSON('/api/opcoes/vagas');
         preencherOpcoes(document.getElementById('filtroLocalizacaoVagas'), opcoes.localizacoes);
         preencherOpcoes(document.getElementById('filtroTermoVagas'), opcoes.termos_origem);
+        preencherOpcoes(document.getElementById('filtroFonteVagas'), opcoes.fontes);
     } catch (erro) {
         console.error('Não foi possível carregar as opções de filtro das vagas', erro);
     }
@@ -119,6 +121,7 @@ async function carregarVagas() {
     const estado = document.getElementById('filtroEstadoVagas').value;
     const localizacao = document.getElementById('filtroLocalizacaoVagas').value;
     const termoOrigem = document.getElementById('filtroTermoVagas').value;
+    const fonte = document.getElementById('filtroFonteVagas').value;
     const periodo = document.getElementById('filtroPeriodoVagas').value;
 
     const parametros = new URLSearchParams();
@@ -126,6 +129,7 @@ async function carregarVagas() {
     if (estado) parametros.set('estado', estado);
     if (localizacao) parametros.set('localizacao', localizacao);
     if (termoOrigem) parametros.set('termo_origem', termoOrigem);
+    if (fonte) parametros.set('fonte', fonte);
     if (periodo) parametros.set('periodo', periodo);
 
     try {
@@ -235,6 +239,7 @@ function configurarFiltros() {
     document.getElementById('filtroEstadoVagas').addEventListener('change', carregarVagas);
     document.getElementById('filtroLocalizacaoVagas').addEventListener('change', carregarVagas);
     document.getElementById('filtroTermoVagas').addEventListener('change', carregarVagas);
+    document.getElementById('filtroFonteVagas').addEventListener('change', carregarVagas);
     document.getElementById('filtroPeriodoVagas').addEventListener('change', carregarVagas);
     document.getElementById('filtroTextoNoticias').addEventListener('input', comAtraso(carregarNoticias));
     document.getElementById('filtroFonteNoticias').addEventListener('change', carregarNoticias);

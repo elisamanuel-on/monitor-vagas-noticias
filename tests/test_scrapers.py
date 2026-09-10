@@ -14,7 +14,7 @@ import pytest
 os.environ.setdefault("MONGODB_URI", "mongodb://localhost/teste")
 os.environ.setdefault("ITJOBS_API_KEY", "chave-de-teste")
 
-from app.scrapers import noticias_rss, vagas_itjobs  # noqa: E402
+from app.scrapers import noticias_rss, vagas_itjobs, vagas_landing_jobs, vagas_netempregos  # noqa: E402
 
 
 @pytest.fixture
@@ -22,6 +22,22 @@ def colecao_vagas_falsa(monkeypatch):
     cliente = mongomock.MongoClient()
     colecao = cliente["teste"]["vagas"]
     monkeypatch.setattr(vagas_itjobs, "get_vagas_collection", lambda: colecao)
+    return colecao
+
+
+@pytest.fixture
+def colecao_vagas_landing_falsa(monkeypatch):
+    cliente = mongomock.MongoClient()
+    colecao = cliente["teste"]["vagas"]
+    monkeypatch.setattr(vagas_landing_jobs, "get_vagas_collection", lambda: colecao)
+    return colecao
+
+
+@pytest.fixture
+def colecao_vagas_netempregos_falsa(monkeypatch):
+    cliente = mongomock.MongoClient()
+    colecao = cliente["teste"]["vagas"]
+    monkeypatch.setattr(vagas_netempregos, "get_vagas_collection", lambda: colecao)
     return colecao
 
 
@@ -85,6 +101,52 @@ def test_recolher_vagas_sem_api_key_da_erro_claro(monkeypatch):
         vagas_itjobs.recolher_vagas()
 
 
+RESPOSTA_LANDING_JOBS_EXEMPLO = [
+    {
+        "id": 555,
+        "title": "Python Backend Engineer",
+        "tags": ["Python", "FastAPI"],
+        "url": "https://landing.jobs/at/empresa-exemplo/python-backend-engineer",
+        "published_at": "2026-09-01T10:00:00.000Z",
+        "remote": True,
+        "locations": [],
+        "gross_salary_low": 35000,
+        "gross_salary_high": 45000,
+    }
+]
+
+
+def test_recolher_vagas_landing_jobs_filtra_por_termo(colecao_vagas_landing_falsa, monkeypatch):
+    monkeypatch.setenv("VAGAS_QUERY", "python")
+
+    with patch.object(
+        vagas_landing_jobs, "procurar_pagina", side_effect=[RESPOSTA_LANDING_JOBS_EXEMPLO, []]
+    ):
+        total = vagas_landing_jobs.recolher_vagas()
+
+    assert total == 1
+    guardada = colecao_vagas_landing_falsa.find_one(
+        {"link": "https://landing.jobs/at/empresa-exemplo/python-backend-engineer"}
+    )
+    assert guardada is not None
+    assert guardada["empresa"] == "Empresa Exemplo"
+    assert guardada["fonte"] == "Landing.jobs"
+    assert guardada["estado"] == "por_candidatar"
+
+
+def test_recolher_vagas_landing_jobs_ignora_vagas_sem_termo_correspondente(
+    colecao_vagas_landing_falsa, monkeypatch
+):
+    monkeypatch.setenv("VAGAS_QUERY", "cobol")  # não corresponde a nada no exemplo
+    with patch.object(
+        vagas_landing_jobs, "procurar_pagina", side_effect=[RESPOSTA_LANDING_JOBS_EXEMPLO, []]
+    ):
+        total = vagas_landing_jobs.recolher_vagas()
+
+    assert total == 0
+    assert colecao_vagas_landing_falsa.count_documents({}) == 0
+
+
 class _EntradaFeedFalsa(dict):
     """Simula uma entrada do feedparser (que devolve objetos tipo-dict com atributos)."""
 
@@ -127,3 +189,44 @@ def test_recolher_noticias_nao_duplica_a_mesma_noticia(colecao_noticias_falsa, m
     noticias_rss.recolher_noticias()
 
     assert colecao_noticias_falsa.count_documents({}) == 1
+
+
+def test_recolher_vagas_netempregos_filtra_por_termo(colecao_vagas_netempregos_falsa, monkeypatch):
+    monkeypatch.setenv("VAGAS_QUERY", "python")
+    entrada = _EntradaFeedFalsa(
+        title="Procura-se Programador Python Júnior",
+        link="https://exemplo.pt/vaga-1",
+        author="Empresa X",
+        summary="Vaga para programador",
+        published_parsed=(2026, 9, 1, 9, 0, 0, 0, 0, 0),
+    )
+    feed_falso = MagicMock(bozo=False, entries=[entrada])
+    monkeypatch.setattr(vagas_netempregos.feedparser, "parse", lambda url: feed_falso)
+
+    total = vagas_netempregos.recolher_vagas()
+
+    assert total == 1
+    guardada = colecao_vagas_netempregos_falsa.find_one({"link": "https://exemplo.pt/vaga-1"})
+    assert guardada is not None
+    assert guardada["fonte"] == "Net-Empregos"
+    assert guardada["estado"] == "por_candidatar"
+
+
+def test_recolher_vagas_netempregos_ignora_vagas_sem_termo_correspondente(
+    colecao_vagas_netempregos_falsa, monkeypatch
+):
+    monkeypatch.setenv("VAGAS_QUERY", "cobol")  # não corresponde a nada na entrada de exemplo
+    entrada = _EntradaFeedFalsa(
+        title="Procura-se Empregado de Loja",
+        link="https://exemplo.pt/vaga-2",
+        author="Empresa Y",
+        summary="Vaga de loja",
+        published_parsed=(2026, 9, 1, 9, 0, 0, 0, 0, 0),
+    )
+    feed_falso = MagicMock(bozo=False, entries=[entrada])
+    monkeypatch.setattr(vagas_netempregos.feedparser, "parse", lambda url: feed_falso)
+
+    total = vagas_netempregos.recolher_vagas()
+
+    assert total == 0
+    assert colecao_vagas_netempregos_falsa.count_documents({}) == 0

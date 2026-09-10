@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
+from pymongo.errors import OperationFailure
 
 load_dotenv()
 
@@ -49,7 +50,16 @@ def get_db() -> Database:
 
 def get_vagas_collection() -> Collection:
     colecao = get_db()["vagas"]
-    colecao.create_index("itjobs_id", unique=True)
+    # até agora a chave única era o itjobs_id (só fazia sentido quando a
+    # única fonte de vagas era a API da ITJobs); agora que há várias fontes
+    # (ITJobs, Landing.jobs, Net-Empregos), a chave única passa a ser o
+    # `link` de cada vaga — é sempre único, seja qual for a fonte de onde
+    # veio, tal como já acontece na coleção de notícias.
+    try:
+        colecao.drop_index("itjobs_id_1")
+    except OperationFailure:
+        pass  # já não existia (instalação nova, ou já tinha sido removido antes)
+    colecao.create_index("link", unique=True)
     return colecao
 
 
