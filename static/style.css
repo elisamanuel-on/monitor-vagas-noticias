@@ -1,0 +1,313 @@
+/* Monitor de Vagas & Notícias — identidade visual própria: claro, "SaaS de
+   dados", tipografia sem serifa. Propositadamente diferente do tema
+   dark-terminal-verde do Controlo de Gastos, para mostrar versatilidade. */
+
+:root {
+    --cor-fundo: #f5f6fb;
+    --cor-superficie: #ffffff;
+    --cor-borda: #e4e6f1;
+    --cor-texto: #1f2333;
+    --cor-texto-suave: #6b7085;
+    --cor-primaria: #4f46e5;
+    --cor-primaria-suave: #eef0fd;
+    --cor-sucesso: #0d9488;
+    --cor-sucesso-suave: #e6f7f5;
+    --cor-aviso: #d97706;
+    --cor-aviso-suave: #fdf1e2;
+    --raio: 14px;
+    --sombra: 0 1px 2px rgba(31, 35, 51, 0.04), 0 8px 24px rgba(31, 35, 51, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.topo {
+    background: var(--cor-superficie);
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.topo-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.marca-ponto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cor-primaria);
+    display: inline-block;
+}
+
+.link-portfolio {
+    color: var(--cor-texto-suave);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.link-portfolio:hover { color: var(--cor-primaria); }
+
+.intro {
+    padding: 40px 0 8px;
+}
+
+.intro h1 {
+    margin: 0 0 10px;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+}
+
+.intro-texto {
+    color: var(--cor-texto-suave);
+    max-width: 62ch;
+    margin: 0;
+}
+
+.resumo-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 28px 0;
+}
+
+.card-resumo {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: var(--sombra);
+}
+
+.card-resumo-destaque {
+    border-color: var(--cor-primaria);
+    background: var(--cor-primaria-suave);
+}
+
+.card-resumo-valor {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.card-resumo-label {
+    font-size: 0.82rem;
+    color: var(--cor-texto-suave);
+}
+
+.abas {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--cor-borda);
+    margin-bottom: 20px;
+}
+
+.aba {
+    appearance: none;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 4px;
+    margin-right: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cor-texto-suave);
+    cursor: pointer;
+}
+
+.aba-ativa {
+    color: var(--cor-primaria);
+    border-bottom-color: var(--cor-primaria);
+}
+
+.filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filtros input, .filtros select {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+}
+
+.filtros input[type="search"] {
+    flex: 1;
+    min-width: 200px;
+}
+
+.lista {
+    display: grid;
+    gap: 12px;
+    padding-bottom: 60px;
+}
+
+.estado-vazio {
+    color: var(--cor-texto-suave);
+    padding: 24px;
+    text-align: center;
+    background: var(--cor-superficie);
+    border: 1px dashed var(--cor-borda);
+    border-radius: var(--raio);
+}
+
+.cartao-vaga, .cartao-noticia {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    padding: 16px 18px;
+    box-shadow: var(--sombra);
+}
+
+.cartao-vaga-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cartao-vaga-cabecalho h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.etiqueta-estado {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: var(--cor-aviso-suave);
+    color: var(--cor-aviso);
+}
+
+.etiqueta-estado[data-estado="candidatei_me"] {
+    background: var(--cor-primaria-suave);
+    color: var(--cor-primaria);
+}
+
+.etiqueta-estado[data-estado="resposta_recebida"] {
+    background: var(--cor-sucesso-suave);
+    color: var(--cor-sucesso);
+}
+
+.etiqueta-estado[data-estado="arquivada"] {
+    background: #f1f1f4;
+    color: var(--cor-texto-suave);
+}
+
+.cartao-vaga-empresa {
+    margin: 4px 0 2px;
+    font-weight: 600;
+    color: var(--cor-texto-suave);
+}
+
+.cartao-vaga-detalhes {
+    margin: 0 0 12px;
+    font-size: 0.88rem;
+    color: var(--cor-texto-suave);
+}
+
+.cartao-vaga-rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cartao-vaga-link {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.cartao-vaga-link:hover { text-decoration: underline; }
+
+.seletor-estado {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+    background: var(--cor-fundo);
+}
+
+.cartao-noticia-fonte {
+    margin: 0 0 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cor-primaria);
+}
+
+.cartao-noticia h3 {
+    margin: 0 0 6px;
+    font-size: 1.02rem;
+}
+
+.cartao-noticia h3 a {
+    color: var(--cor-texto);
+    text-decoration: none;
+}
+
+.cartao-noticia h3 a:hover { color: var(--cor-primaria); }
+
+.cartao-noticia-resumo {
+    margin: 0 0 8px;
+    color: var(--cor-texto-suave);
+    font-size: 0.9rem;
+}
+
+.cartao-noticia-data {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--cor-texto-suave);
+}
+
+.rodape {
+    text-align: center;
+    padding: 24px 20px 40px;
+    color: var(--cor-texto-suave);
+    font-size: 0.85rem;
+}
+
+.rodape a { color: var(--cor-primaria); }
+
+@media (max-width: 480px) {
+    .intro h1 { font-size: 1.6rem; }
+    .cartao-vaga-rodape { flex-direction: column; align-items: stretch; }
+}

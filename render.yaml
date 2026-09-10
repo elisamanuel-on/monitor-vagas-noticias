@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: monitor-vagas-noticias
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MONGODB_URI
+        sync: false  # define manualmente no dashboard do Render (connection string do Atlas) — não fica no repositório
+      - key: MONGODB_DB
+        value: monitor_vagas_noticias

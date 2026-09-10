@@ -1,0 +1,29 @@
+name: Recolher vagas e notícias
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  recolher:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Correr os robôs de recolha
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ vars.MONGODB_DB }}
+          ITJOBS_API_KEY: ${{ secrets.ITJOBS_API_KEY }}
+          VAGAS_QUERY: ${{ vars.VAGAS_QUERY }}
+          VAGAS_LOCATION_IDS: ${{ vars.VAGAS_LOCATION_IDS }}
+          NOTICIAS_QUERY: ${{ vars.NOTICIAS_QUERY }}
+        run: python -m scripts.run_scrapers

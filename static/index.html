@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Vagas & Notícias | Elisama Manuel</title>
+    <meta name="description" content="Painel pessoal que acompanha vagas de emprego reais e notícias do setor de tecnologia interativa, recolhidas automaticamente.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topo">
+        <div class="container topo-conteudo">
+            <div class="marca">
+                <span class="marca-ponto"></span>
+                <span>monitor-vagas-noticias</span>
+            </div>
+            <a href="https://elisamanuel-on.github.io/portfolio.html" class="link-portfolio">← Portfólio de Elisama Manuel</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <h1>Monitor de Vagas &amp; Notícias</h1>
+            <p class="intro-texto">
+                Robôs em Python correm automaticamente todos os dias: um vai buscar vagas
+                reais à API da <strong>ITJobs</strong>, outro procura notícias reais sobre o
+                setor de tecnologia interativa. Tudo fica guardado em <strong>MongoDB</strong>
+                e mostrado aqui.
+            </p>
+        </section>
+
+        <section class="resumo-cards" id="resumoCards" aria-live="polite">
+            <div class="card-resumo">
+                <span class="card-resumo-valor" id="resumoTotalVagas">—</span>
+                <span class="card-resumo-label">Vagas encontradas</span>
+            </div>
+            <div class="card-resumo card-resumo-destaque">
+                <span class="card-resumo-valor" id="resumoPorCandidatar">—</span>
+                <span class="card-resumo-label">Por candidatar</span>
+            </div>
+            <div class="card-resumo">
+                <span class="card-resumo-valor" id="resumoCandidateiMe">—</span>
+                <span class="card-resumo-label">Já me candidatei</span>
+            </div>
+            <div class="card-resumo">
+                <span class="card-resumo-valor" id="resumoRespostaRecebida">—</span>
+                <span class="card-resumo-label">Com resposta</span>
+            </div>
+            <div class="card-resumo">
+                <span class="card-resumo-valor" id="resumoTotalNoticias">—</span>
+                <span class="card-resumo-label">Notícias do setor</span>
+            </div>
+        </section>
+
+        <nav class="abas" role="tablist" aria-label="Secções">
+            <button class="aba aba-ativa" data-aba="vagas" role="tab" aria-selected="true">Vagas</button>
+            <button class="aba" data-aba="noticias" role="tab" aria-selected="false">Notícias</button>
+        </nav>
+
+        <section class="painel" data-painel="vagas">
+            <div class="filtros">
+                <input type="search" id="filtroTextoVagas" placeholder="Pesquisar por título ou empresa…">
+                <select id="filtroEstadoVagas">
+                    <option value="">Todos os estados</option>
+                    <option value="por_candidatar">Por candidatar</option>
+                    <option value="candidatei_me">Já me candidatei</option>
+                    <option value="resposta_recebida">Com resposta</option>
+                    <option value="arquivada">Arquivada</option>
+                </select>
+            </div>
+            <div class="lista" id="listaVagas">
+                <p class="estado-vazio">A carregar vagas…</p>
+            </div>
+        </section>
+
+        <section class="painel" data-painel="noticias" hidden>
+            <div class="filtros">
+                <input type="search" id="filtroTextoNoticias" placeholder="Pesquisar notícias…">
+            </div>
+            <div class="lista" id="listaNoticias">
+                <p class="estado-vazio">A carregar notícias…</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+
+    <template id="modeloVaga">
+        <article class="cartao-vaga">
+            <div class="cartao-vaga-cabecalho">
+                <h3></h3>
+                <span class="etiqueta-estado"></span>
+            </div>
+            <p class="cartao-vaga-empresa"></p>
+            <p class="cartao-vaga-detalhes"></p>
+            <div class="cartao-vaga-rodape">
+                <a class="cartao-vaga-link" target="_blank" rel="noopener">Ver vaga →</a>
+                <select class="seletor-estado">
+                    <option value="por_candidatar">Por candidatar</option>
+                    <option value="candidatei_me">Já me candidatei</option>
+                    <option value="resposta_recebida">Com resposta</option>
+                    <option value="arquivada">Arquivada</option>
+                </select>
+            </div>
+        </article>
+    </template>
+
+    <template id="modeloNoticia">
+        <article class="cartao-noticia">
+            <p class="cartao-noticia-fonte"></p>
+            <h3><a target="_blank" rel="noopener"></a></h3>
+            <p class="cartao-noticia-resumo"></p>
+            <p class="cartao-noticia-data"></p>
+        </article>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>
