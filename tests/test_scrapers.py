@@ -165,15 +165,18 @@ HTML_PAGINA_NETEMPREGOS_EXEMPLO = """
 """
 
 
-def test_recolher_vagas_netempregos_filtra_por_termo(colecao_vagas_netempregos_falsa, monkeypatch):
-    monkeypatch.setenv("VAGAS_QUERY", "python")
-
+def test_recolher_vagas_netempregos_grava_todas_as_vagas_da_categoria(
+    colecao_vagas_netempregos_falsa,
+):
+    # Sem filtro local de termos: como a página já é só a categoria
+    # "Informática (Programação)", todas as vagas encontradas são gravadas
+    # (ver nota em vagas_netempregos.py sobre porquê o filtro foi removido).
     with patch.object(
         vagas_netempregos, "procurar_pagina", side_effect=[HTML_PAGINA_NETEMPREGOS_EXEMPLO, ""]
     ):
         total = vagas_netempregos.recolher_vagas()
 
-    assert total == 1
+    assert total == 2
     guardada = colecao_vagas_netempregos_falsa.find_one(
         {"link": "https://www.net-empregos.com/15935141/programador-full-stack-python/"}
     )
@@ -182,15 +185,8 @@ def test_recolher_vagas_netempregos_filtra_por_termo(colecao_vagas_netempregos_f
     assert guardada["fonte"] == "Net-Empregos"
     assert guardada["estado"] == "por_candidatar"
 
-
-def test_recolher_vagas_netempregos_ignora_vagas_sem_termo_correspondente(
-    colecao_vagas_netempregos_falsa, monkeypatch
-):
-    monkeypatch.setenv("VAGAS_QUERY", "cobol")  # não corresponde a nenhum título de exemplo
-    with patch.object(
-        vagas_netempregos, "procurar_pagina", side_effect=[HTML_PAGINA_NETEMPREGOS_EXEMPLO, ""]
-    ):
-        total = vagas_netempregos.recolher_vagas()
-
-    assert total == 0
-    assert colecao_vagas_netempregos_falsa.count_documents({}) == 0
+    outra_guardada = colecao_vagas_netempregos_falsa.find_one(
+        {"link": "https://www.net-empregos.com/15941898/tecnico-de-hardware/"}
+    )
+    assert outra_guardada is not None
+    assert outra_guardada["empresa"] == "Empresa Y"

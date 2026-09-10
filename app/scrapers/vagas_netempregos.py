@@ -8,9 +8,15 @@ anterior deste ficheiro): o feed RSS geral (/rssfeed.asp) mistura ofertas de
 TODOS os setores — de ~20 ofertas por leitura só 1 ou 2 eram de tecnologia,
 por isso quase nunca havia nada relevante para guardar. Esta página da
 categoria já vem só com ofertas de "Informática (Programação)" (perto de
-1000 no total), e ainda filtramos localmente pelo título com os termos
-configurados em VAGAS_QUERY, para focar nas tuas áreas de interesse
-específicas dentro da programação.
+1000 no total).
+
+Ao contrário da ITJobs, aqui NÃO filtramos localmente pelos termos de
+VAGAS_QUERY: essa opção foi testada e eliminava praticamente tudo, porque
+compara só com o título da vaga, e a maioria dos títulos reais (ex:
+"Fullstack Developer", "DevOps Engineer") não contém literalmente palavras
+como "python" ou "fastapi" — mesmo sendo vagas de programação relevantes.
+Como a categoria em si já é o filtro (é só "Informática (Programação)"),
+guardamos todas as vagas encontradas em cada execução.
 
 O robots.txt do site permite isto (`User-agent: * / Allow: /`) — não há
 nenhuma proibição a páginas de categoria como esta.
@@ -29,7 +35,6 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 
 from app.database import get_vagas_collection
-from app.scrapers.utils import termos_pesquisa, texto_contem_algum_termo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -105,12 +110,11 @@ def _para_documento(item: Tag) -> Optional[dict]:
 
 def recolher_vagas() -> int:
     """
-    Percorre as páginas da categoria "Informática (Programação)", filtra
-    localmente pelo título com os termos configurados (VAGAS_QUERY) e
-    grava/atualiza as vagas relevantes no MongoDB. Devolve o número de
-    vagas processadas.
+    Percorre as páginas da categoria "Informática (Programação)" e
+    grava/atualiza todas as vagas encontradas no MongoDB (sem filtro local
+    de termos — ver nota no topo do ficheiro). Devolve o número de vagas
+    processadas.
     """
-    termos = termos_pesquisa()
     colecao = get_vagas_collection()
     total_processadas = 0
 
@@ -124,8 +128,6 @@ def recolher_vagas() -> int:
         for item in itens:
             documento = _para_documento(item)
             if documento is None:
-                continue
-            if not texto_contem_algum_termo(documento["titulo"], termos):
                 continue
 
             agora = datetime.now(timezone.utc)

@@ -4,7 +4,7 @@ Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
 - **Vagas de emprego reais**, de duas fontes diferentes, ambas filtradas pelas mesmas palavras-chave (`VAGAS_QUERY`):
   - [API oficial da ITJobs](https://www.itjobs.pt/api) — vagas de tecnologia em Portugal.
-  - [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), o maior portal de emprego generalista de Portugal — lemos a categoria "Informática (Programação)" diretamente (o feed RSS geral do site mistura todos os setores e quase não trazia vagas de tecnologia).
+  - [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), o maior portal de emprego generalista de Portugal — lemos a categoria "Informática (Programação)" diretamente (o feed RSS geral do site mistura todos os setores e quase não trazia vagas de tecnologia). Aqui não há filtro por `VAGAS_QUERY`: a categoria já é o filtro, e filtrar outra vez só pelo título eliminava quase todas as vagas reais (títulos como "Fullstack Developer" não contêm literalmente "python").
   - (Foi testada também a [API pública do Landing.jobs](https://landing.jobs), mas bloqueia sempre os pedidos vindos do GitHub Actions — não é algo que dê para contornar do nosso lado, por isso ficou de fora do robô automático.)
 - **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) — via feed RSS de pesquisa do Google Notícias.
 
