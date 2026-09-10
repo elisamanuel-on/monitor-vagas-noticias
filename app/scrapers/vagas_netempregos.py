@@ -60,6 +60,22 @@ def procurar_pagina(pagina: int) -> str:
     resposta = requests.get(
         CATEGORIA_URL, params=parametros, headers=CABECALHOS_PEDIDO, timeout=20
     )
+    # Diagnóstico temporário: o site pode devolver 200 OK mas com uma página
+    # de bloqueio/desafio (ex: Cloudflare) em vez do HTML real — isto não dá
+    # erro (raise_for_status não dispara), mas também não tem vagas nenhumas.
+    # Estas linhas de log ajudam a confirmar se é isso que está a acontecer
+    # a partir do GitHub Actions.
+    titulo_pagina = None
+    inicio_texto = BeautifulSoup(resposta.text, "html.parser").title
+    if inicio_texto:
+        titulo_pagina = inicio_texto.get_text(strip=True)
+    logger.info(
+        "Net-Empregos página %d: status=%d, tamanho=%d bytes, <title>=%r",
+        pagina,
+        resposta.status_code,
+        len(resposta.text),
+        titulo_pagina,
+    )
     resposta.raise_for_status()
     return resposta.text
 
