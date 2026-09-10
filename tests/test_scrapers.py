@@ -137,23 +137,48 @@ def test_recolher_noticias_nao_duplica_a_mesma_noticia(colecao_noticias_falsa, m
     assert colecao_noticias_falsa.count_documents({}) == 1
 
 
+HTML_PAGINA_NETEMPREGOS_EXEMPLO = """
+<html><body>
+<div class="job-item">
+    <h2><a class="oferta-link" href="/15935141/programador-full-stack-python/">Programador Full-Stack Python</a></h2>
+    <div class="job-ad-item">
+        <ul>
+            <li><i class="flaticon-calendar"></i> 10-9-2026</li>
+            <li><i class="flaticon-pin"></i> Porto</li>
+            <li><i class="fa fa-tags"></i> Informática ( Programação )</li>
+            <li><i class="flaticon-work"></i> Empresa X</li>
+        </ul>
+    </div>
+</div>
+<div class="job-item">
+    <h2><a class="oferta-link" href="/15941898/tecnico-de-hardware/">Técnico de Hardware</a></h2>
+    <div class="job-ad-item">
+        <ul>
+            <li><i class="flaticon-calendar"></i> 9-9-2026</li>
+            <li><i class="flaticon-pin"></i> Lisboa</li>
+            <li><i class="fa fa-tags"></i> Informática ( Programação )</li>
+            <li><i class="flaticon-work"></i> Empresa Y</li>
+        </ul>
+    </div>
+</div>
+</body></html>
+"""
+
+
 def test_recolher_vagas_netempregos_filtra_por_termo(colecao_vagas_netempregos_falsa, monkeypatch):
     monkeypatch.setenv("VAGAS_QUERY", "python")
-    entrada = _EntradaFeedFalsa(
-        title="Procura-se Programador Python Júnior",
-        link="https://exemplo.pt/vaga-1",
-        author="Empresa X",
-        summary="Vaga para programador",
-        published_parsed=(2026, 9, 1, 9, 0, 0, 0, 0, 0),
-    )
-    feed_falso = MagicMock(bozo=False, entries=[entrada])
-    monkeypatch.setattr(vagas_netempregos.feedparser, "parse", lambda url: feed_falso)
 
-    total = vagas_netempregos.recolher_vagas()
+    with patch.object(
+        vagas_netempregos, "procurar_pagina", side_effect=[HTML_PAGINA_NETEMPREGOS_EXEMPLO, ""]
+    ):
+        total = vagas_netempregos.recolher_vagas()
 
     assert total == 1
-    guardada = colecao_vagas_netempregos_falsa.find_one({"link": "https://exemplo.pt/vaga-1"})
+    guardada = colecao_vagas_netempregos_falsa.find_one(
+        {"link": "https://www.net-empregos.com/15935141/programador-full-stack-python/"}
+    )
     assert guardada is not None
+    assert guardada["empresa"] == "Empresa X"
     assert guardada["fonte"] == "Net-Empregos"
     assert guardada["estado"] == "por_candidatar"
 
@@ -161,18 +186,11 @@ def test_recolher_vagas_netempregos_filtra_por_termo(colecao_vagas_netempregos_f
 def test_recolher_vagas_netempregos_ignora_vagas_sem_termo_correspondente(
     colecao_vagas_netempregos_falsa, monkeypatch
 ):
-    monkeypatch.setenv("VAGAS_QUERY", "cobol")  # não corresponde a nada na entrada de exemplo
-    entrada = _EntradaFeedFalsa(
-        title="Procura-se Empregado de Loja",
-        link="https://exemplo.pt/vaga-2",
-        author="Empresa Y",
-        summary="Vaga de loja",
-        published_parsed=(2026, 9, 1, 9, 0, 0, 0, 0, 0),
-    )
-    feed_falso = MagicMock(bozo=False, entries=[entrada])
-    monkeypatch.setattr(vagas_netempregos.feedparser, "parse", lambda url: feed_falso)
-
-    total = vagas_netempregos.recolher_vagas()
+    monkeypatch.setenv("VAGAS_QUERY", "cobol")  # não corresponde a nenhum título de exemplo
+    with patch.object(
+        vagas_netempregos, "procurar_pagina", side_effect=[HTML_PAGINA_NETEMPREGOS_EXEMPLO, ""]
+    ):
+        total = vagas_netempregos.recolher_vagas()
 
     assert total == 0
     assert colecao_vagas_netempregos_falsa.count_documents({}) == 0

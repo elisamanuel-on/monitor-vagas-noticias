@@ -4,7 +4,7 @@ Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
 - **Vagas de emprego reais**, de duas fontes diferentes, ambas filtradas pelas mesmas palavras-chave (`VAGAS_QUERY`):
   - [API oficial da ITJobs](https://www.itjobs.pt/api) — vagas de tecnologia em Portugal.
-  - [Feed RSS do Net-Empregos](https://www.net-empregos.com/rssfeed.asp) — o maior portal de emprego generalista de Portugal (filtrado localmente, porque o feed cobre todos os setores).
+  - [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), o maior portal de emprego generalista de Portugal — lemos a categoria "Informática (Programação)" diretamente (o feed RSS geral do site mistura todos os setores e quase não trazia vagas de tecnologia).
   - (Foi testada também a [API pública do Landing.jobs](https://landing.jobs), mas bloqueia sempre os pedidos vindos do GitHub Actions — não é algo que dê para contornar do nosso lado, por isso ficou de fora do robô automático.)
 - **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) — via feed RSS de pesquisa do Google Notícias.
 
@@ -25,7 +25,7 @@ app/
   models.py            # schemas Pydantic
   scrapers/
     vagas_itjobs.py        # recolhe vagas reais da API da ITJobs
-    vagas_netempregos.py   # recolhe vagas reais do feed RSS do Net-Empregos
+    vagas_netempregos.py   # recolhe vagas reais da categoria "Informática (Programação)" do Net-Empregos
     noticias_rss.py        # recolhe notícias reais via RSS
     utils.py                # configuração partilhada (VAGAS_QUERY) entre as fontes de vagas
 scripts/
@@ -56,7 +56,7 @@ Os dois robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são inde
 
 Em [itjobs.pt/api](https://www.itjobs.pt/api), preenche só o teu email — a chave (de leitura) chega logo.
 
-O Net-Empregos (feed RSS) **não precisa de chave nenhuma** — já funciona sem configuração extra.
+O Net-Empregos **não precisa de chave nenhuma** — já funciona sem configuração extra.
 
 ### 3. Variáveis de ambiente
 
