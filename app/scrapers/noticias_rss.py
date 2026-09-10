@@ -23,9 +23,10 @@ GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=pt-PT&gl=PT&c
 
 
 def _query_configurada() -> str:
-    return os.environ.get(
-        "NOTICIAS_QUERY",
-        'tecnologia interativa OR "digital signage" OR "ecrãs interativos"',
+    # "or", não o 2º argumento do .get(): ver a nota em database.py sobre
+    # Variables por definir no GitHub Actions chegarem como "" e não ausentes.
+    return os.environ.get("NOTICIAS_QUERY") or (
+        'tecnologia interativa OR "digital signage" OR "ecrãs interativos"'
     )
 
 

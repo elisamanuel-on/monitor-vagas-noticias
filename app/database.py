@@ -33,7 +33,11 @@ def get_client() -> MongoClient:
 
 
 def get_db() -> Database:
-    nome = os.environ.get("MONGODB_DB", "monitor_vagas_noticias")
+    # "or" em vez do 2º argumento do .get(): no GitHub Actions, uma "Variable"
+    # (vars.X) que não exista chega aqui como env var DEFINIDA mas vazia (""),
+    # não como env var ausente — por isso .get("MONGODB_DB", "omissão") não
+    # chegaria a usar a omissão. O "or" apanha também esse caso.
+    nome = os.environ.get("MONGODB_DB") or "monitor_vagas_noticias"
     return get_client()[nome]
 
 

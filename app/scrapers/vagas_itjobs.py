@@ -25,7 +25,9 @@ ITJOBS_SEARCH_URL = "https://api.itjobs.pt/job/search.json"
 
 
 def _termos_pesquisa() -> list[str]:
-    bruto = os.environ.get("VAGAS_QUERY", "python,fastapi,programador web")
+    # "or", não o 2º argumento do .get(): uma Variable do GitHub Actions por
+    # definir chega como env var vazia (""), não ausente — ver database.py.
+    bruto = os.environ.get("VAGAS_QUERY") or "python,fastapi,programador web"
     return [termo.strip() for termo in bruto.split(",") if termo.strip()]
 
 
