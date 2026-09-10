@@ -65,7 +65,7 @@ def listar_vagas(
         None, description="Filtrar pelo termo de pesquisa que encontrou a vaga"
     ),
     fonte: Optional[str] = Query(
-        None, description="Filtrar pela fonte da vaga (ex: ITJobs, Landing.jobs, Net-Empregos)"
+        None, description="Filtrar pela fonte da vaga (ex: ITJobs)"
     ),
     periodo: Optional[str] = Query(
         None, description="Filtrar por data de publicação: '24h', '7d' ou '30d'"

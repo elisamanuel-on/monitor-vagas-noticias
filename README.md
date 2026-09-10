@@ -2,10 +2,8 @@
 
 Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
-- **Vagas de emprego reais**, de duas fontes diferentes, ambas filtradas pelas mesmas palavras-chave (`VAGAS_QUERY`):
-  - [API oficial da ITJobs](https://www.itjobs.pt/api) — vagas de tecnologia em Portugal.
-  - [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), o maior portal de emprego generalista de Portugal — lemos a categoria "Informática (Programação)" diretamente (o feed RSS geral do site mistura todos os setores e quase não trazia vagas de tecnologia). Aqui não há filtro por `VAGAS_QUERY`: a categoria já é o filtro, e filtrar outra vez só pelo título eliminava quase todas as vagas reais (títulos como "Fullstack Developer" não contêm literalmente "python").
-  - (Foi testada também a [API pública do Landing.jobs](https://landing.jobs), mas bloqueia sempre os pedidos vindos do GitHub Actions — não é algo que dê para contornar do nosso lado, por isso ficou de fora do robô automático.)
+- **Vagas de emprego reais**, via [API oficial da ITJobs](https://www.itjobs.pt/api) — vagas de tecnologia em Portugal, filtradas pelas palavras-chave configuradas em `VAGAS_QUERY`.
+  - (Foram testadas e ficaram de fora do robô automático duas outras fontes, por bloquearem sempre os pedidos vindos do GitHub Actions — mesmo com cabeçalhos de browser real, não é algo que dê para contornar do nosso lado: a [API pública do Landing.jobs](https://landing.jobs), que devolvia sempre 403; e o [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), que redirecionava sempre para a página de login em vez de mostrar a lista de vagas.)
 - **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) — via feed RSS de pesquisa do Google Notícias.
 
 Tudo fica guardado em **MongoDB Atlas** e servido por uma API em **FastAPI**, com um frontend próprio em HTML/CSS/JS puro.
@@ -14,7 +12,7 @@ Projeto de portefólio de [Elisama Manuel](https://elisamanuel-on.github.io/port
 
 ## Porque existe
 
-Substitui o trabalho manual de percorrer sites de emprego e ficar de olho em notícias do setor — os dois robôs correm sozinhos uma vez por dia via GitHub Actions, e o dashboard fica só para consulta e para marcar o estado de cada candidatura.
+Substitui o trabalho manual de percorrer sites de emprego e ficar de olho em notícias do setor — os robôs correm sozinhos uma vez por dia via GitHub Actions, e o dashboard fica só para consulta e para marcar o estado de cada candidatura.
 
 ## Arquitetura
 
@@ -25,9 +23,7 @@ app/
   models.py            # schemas Pydantic
   scrapers/
     vagas_itjobs.py        # recolhe vagas reais da API da ITJobs
-    vagas_netempregos.py   # recolhe vagas reais da categoria "Informática (Programação)" do Net-Empregos
     noticias_rss.py        # recolhe notícias reais via RSS
-    utils.py                # configuração partilhada (VAGAS_QUERY) entre as fontes de vagas
 scripts/
   run_scrapers.py      # ponto de entrada usado pelo GitHub Actions (e para correr à mão)
 static/                # frontend (HTML/CSS/JS puro, sem framework)
@@ -37,7 +33,7 @@ tests/                 # testes com respostas simuladas (mocks), não fazem pedi
   tests.yml            # corre os testes em cada push/PR
 ```
 
-Os dois robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são independentes: o robô só precisa de acesso ao MongoDB para gravar dados; a app web só precisa do MongoDB para os ler. Podes correr um sem o outro.
+Os robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são independentes: o robô só precisa de acesso ao MongoDB para gravar dados; a app web só precisa do MongoDB para os ler. Podes correr um sem o outro.
 
 ## Configuração inicial
 
@@ -55,8 +51,6 @@ Os dois robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são inde
 ### 2. API key da ITJobs (gratuita)
 
 Em [itjobs.pt/api](https://www.itjobs.pt/api), preenche só o teu email — a chave (de leitura) chega logo.
-
-O Net-Empregos **não precisa de chave nenhuma** — já funciona sem configuração extra.
 
 ### 3. Variáveis de ambiente
 
@@ -96,11 +90,11 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 ## Deployment
 
-- **Robôs de recolha**: correm automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
+- **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
 
 ## Notas de design
 
 - **Sem autenticação** — é uma ferramenta pessoal, não uma app multiutilizador.
 - **Nunca apaga o estado de uma vaga já classificada**: quando o robô encontra outra vez uma vaga que já conheces, atualiza os outros dados (salário, etc.) mas nunca mexe no campo `estado` que tu própria vais mudando no dashboard.
-- **Dados reais desde o primeiro dia**: nenhuma das duas fontes usa dados de exemplo — a API da ITJobs e o feed RSS são sempre consultados ao vivo.
+- **Dados reais desde o primeiro dia**: nenhuma das fontes usa dados de exemplo — a API da ITJobs e o feed RSS são sempre consultados ao vivo.

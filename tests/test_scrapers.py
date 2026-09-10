@@ -14,7 +14,7 @@ import pytest
 os.environ.setdefault("MONGODB_URI", "mongodb://localhost/teste")
 os.environ.setdefault("ITJOBS_API_KEY", "chave-de-teste")
 
-from app.scrapers import noticias_rss, vagas_itjobs, vagas_netempregos  # noqa: E402
+from app.scrapers import noticias_rss, vagas_itjobs  # noqa: E402
 
 
 @pytest.fixture
@@ -22,14 +22,6 @@ def colecao_vagas_falsa(monkeypatch):
     cliente = mongomock.MongoClient()
     colecao = cliente["teste"]["vagas"]
     monkeypatch.setattr(vagas_itjobs, "get_vagas_collection", lambda: colecao)
-    return colecao
-
-
-@pytest.fixture
-def colecao_vagas_netempregos_falsa(monkeypatch):
-    cliente = mongomock.MongoClient()
-    colecao = cliente["teste"]["vagas"]
-    monkeypatch.setattr(vagas_netempregos, "get_vagas_collection", lambda: colecao)
     return colecao
 
 
@@ -135,58 +127,3 @@ def test_recolher_noticias_nao_duplica_a_mesma_noticia(colecao_noticias_falsa, m
     noticias_rss.recolher_noticias()
 
     assert colecao_noticias_falsa.count_documents({}) == 1
-
-
-HTML_PAGINA_NETEMPREGOS_EXEMPLO = """
-<html><body>
-<div class="job-item">
-    <h2><a class="oferta-link" href="/15935141/programador-full-stack-python/">Programador Full-Stack Python</a></h2>
-    <div class="job-ad-item">
-        <ul>
-            <li><i class="flaticon-calendar"></i> 10-9-2026</li>
-            <li><i class="flaticon-pin"></i> Porto</li>
-            <li><i class="fa fa-tags"></i> Informática ( Programação )</li>
-            <li><i class="flaticon-work"></i> Empresa X</li>
-        </ul>
-    </div>
-</div>
-<div class="job-item">
-    <h2><a class="oferta-link" href="/15941898/tecnico-de-hardware/">Técnico de Hardware</a></h2>
-    <div class="job-ad-item">
-        <ul>
-            <li><i class="flaticon-calendar"></i> 9-9-2026</li>
-            <li><i class="flaticon-pin"></i> Lisboa</li>
-            <li><i class="fa fa-tags"></i> Informática ( Programação )</li>
-            <li><i class="flaticon-work"></i> Empresa Y</li>
-        </ul>
-    </div>
-</div>
-</body></html>
-"""
-
-
-def test_recolher_vagas_netempregos_grava_todas_as_vagas_da_categoria(
-    colecao_vagas_netempregos_falsa,
-):
-    # Sem filtro local de termos: como a página já é só a categoria
-    # "Informática (Programação)", todas as vagas encontradas são gravadas
-    # (ver nota em vagas_netempregos.py sobre porquê o filtro foi removido).
-    with patch.object(
-        vagas_netempregos, "procurar_pagina", side_effect=[HTML_PAGINA_NETEMPREGOS_EXEMPLO, ""]
-    ):
-        total = vagas_netempregos.recolher_vagas()
-
-    assert total == 2
-    guardada = colecao_vagas_netempregos_falsa.find_one(
-        {"link": "https://www.net-empregos.com/15935141/programador-full-stack-python/"}
-    )
-    assert guardada is not None
-    assert guardada["empresa"] == "Empresa X"
-    assert guardada["fonte"] == "Net-Empregos"
-    assert guardada["estado"] == "por_candidatar"
-
-    outra_guardada = colecao_vagas_netempregos_falsa.find_one(
-        {"link": "https://www.net-empregos.com/15941898/tecnico-de-hardware/"}
-    )
-    assert outra_guardada is not None
-    assert outra_guardada["empresa"] == "Empresa Y"
