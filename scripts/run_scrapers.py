@@ -12,16 +12,19 @@ import sys
 
 from app.scrapers.noticias_rss import recolher_noticias
 from app.scrapers.vagas_itjobs import recolher_vagas as recolher_vagas_itjobs
-from app.scrapers.vagas_landing_jobs import recolher_vagas as recolher_vagas_landing_jobs
 from app.scrapers.vagas_netempregos import recolher_vagas as recolher_vagas_netempregos
 
 logger = logging.getLogger(__name__)
 
 # Cada fonte de vagas corre de forma independente: se uma falhar (ex: um site
 # em baixo), as outras continuam na mesma — o erro só é reportado no fim.
+#
+# O Landing.jobs (API pública de vagas de tecnologia) foi testado e removido:
+# bloqueia sempre os pedidos vindos do GitHub Actions (IP de servidor de
+# nuvem), mesmo com cabeçalhos de browser — não é algo que o nosso código
+# consiga contornar, nem faria sentido tentar.
 FONTES_VAGAS = [
     ("vagas:itjobs", recolher_vagas_itjobs),
-    ("vagas:landing.jobs", recolher_vagas_landing_jobs),
     ("vagas:net-empregos", recolher_vagas_netempregos),
 ]
 
