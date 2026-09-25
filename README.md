@@ -4,7 +4,7 @@ Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
 - **Vagas de emprego reais**, via [API oficial da ITJobs](https://www.itjobs.pt/api) - vagas de tecnologia em Portugal, filtradas pelas palavras-chave configuradas em `VAGAS_QUERY`.
   - (Foram testadas e ficaram de fora do robô automático duas outras fontes, por bloquearem sempre os pedidos vindos do GitHub Actions — mesmo com cabeçalhos de browser real, não é algo que dê para contornar do nosso lado: a [API pública do Landing.jobs](https://landing.jobs), que devolvia sempre 403; e o [Net-Empregos](https://www.net-empregos.com/emprego-informatica-programacao.asp), que redirecionava sempre para a página de login em vez de mostrar a lista de vagas.)
-- **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) — via feed RSS de pesquisa do Google Notícias.
+- **Notícias reais** sobre o setor de tecnologia interativa (ecrãs interativos, digital signage, mesas multitoque) - via feed RSS de pesquisa do Google Notícias.
 
 Tudo fica guardado em **MongoDB Atlas** e servido por uma API em **FastAPI**, com um frontend próprio em HTML/CSS/JS puro.
 
@@ -12,7 +12,7 @@ Projeto de portefólio de [Elisama Manuel](https://elisamanuel-on.github.io/port
 
 ## Porque existe
 
-Substitui o trabalho manual de percorrer sites de emprego e ficar de olho em notícias do setor — os robôs correm sozinhos uma vez por dia via GitHub Actions, e o dashboard fica só para consulta e para marcar o estado de cada candidatura.
+Substitui o trabalho manual de percorrer sites de emprego e ficar de olho em notícias do setor, os robôs correm sozinhos uma vez por dia via GitHub Actions, e o dashboard fica só para consulta e para marcar o estado de cada candidatura.
 
 ## Arquitetura
 
@@ -50,7 +50,7 @@ Os robôs (`scripts/run_scrapers.py`) e a app web (`app/main.py`) são independe
 
 ### 2. API key da ITJobs (gratuita)
 
-Em [itjobs.pt/api](https://www.itjobs.pt/api), preenche só o teu email — a chave (de leitura) chega logo.
+Em [itjobs.pt/api](https://www.itjobs.pt/api), preenche só o teu email, a chave (de leitura) chega logo.
 
 ### 3. Variáveis de ambiente
 
@@ -86,7 +86,7 @@ uvicorn app.main:app --reload
 pytest -v
 ```
 
-Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pedidos reais à internet) e uma base de dados MongoDB simulada em memória (`mongomock`) — correm em qualquer máquina, sem precisar de chaves API nem de ligação real ao MongoDB.
+Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pedidos reais à internet) e uma base de dados MongoDB simulada em memória (`mongomock`), correm em qualquer máquina, sem precisar de chaves API nem de ligação real ao MongoDB.
 
 ## Deployment
 
