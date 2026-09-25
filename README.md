@@ -61,7 +61,7 @@ Copia `.env.example` para `.env` e preenche com os teus valores. **O `.env` nunc
 No repositório: **Settings → Secrets and variables → Actions**
 
 - Secrets (valores sensíveis): `MONGODB_URI`, `ITJOBS_API_KEY`
-- Variables (não sensíveis, opcionais — têm valores por omissão no código se não definires): `MONGODB_DB`, `VAGAS_QUERY`, `VAGAS_LOCATION_IDS`, `NOTICIAS_QUERY`
+- Variables (não sensíveis, opcionais, têm valores por omissão no código se não definires): `MONGODB_DB`, `VAGAS_QUERY`, `VAGAS_LOCATION_IDS`, `NOTICIAS_QUERY`
 
 ### 5. Variável de ambiente no Render (para o dashboard)
 
@@ -95,6 +95,6 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 ## Notas de design
 
-- **Sem autenticação** — é uma ferramenta pessoal, não uma app multiutilizador.
+- **Sem autenticação** é uma ferramenta pessoal, não uma app multiutilizador.
 - **Nunca apaga o estado de uma vaga já classificada**: quando o robô encontra outra vez uma vaga que já conheces, atualiza os outros dados (salário, etc.) mas nunca mexe no campo `estado` que tu própria vais mudando no dashboard.
-- **Dados reais desde o primeiro dia**: nenhuma das fontes usa dados de exemplo — a API da ITJobs e o feed RSS são sempre consultados ao vivo.
+- **Dados reais desde o primeiro dia**: nenhuma das fontes usa dados de exemplo, a API da ITJobs e o feed RSS são sempre consultados ao vivo.
