@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor de Vagas & Notícias | Elisama Manuel</title>
+<meta name="description" content="Painel automático que recolhe vagas de emprego reais e notícias do setor de tecnologia interativa todos os dias, sem intervenção manual.">
+<link rel="icon" type="image/svg+xml" href="/static/logo-mark.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/static/vitrine.css">
+</head>
+<body>
+<header class="topo">
+    <div class="container topo-conteudo">
+        <a href="/" class="marca">
+            <img src="/static/logo-mark.svg" alt="">
+            <span class="marca-nome">Monitor</span>
+        </a>
+        <a href="https://elisamanuel-on.github.io/portfolio.html" class="link-portfolio">← Portfólio de Elisama Manuel</a>
+    </div>
+</header>
+
+<section class="heroi">
+    <div class="container">
+        <span class="heroi-selo"><span class="heroi-ponto"></span> Dados reais · atualizados todos os dias</span>
+        <h1>Vagas de emprego e notícias do setor, recolhidas sozinhas todas as manhãs</h1>
+        <p class="sub">Dois robôs em Python correm automaticamente todos os dias: um vai buscar vagas reais à API da ITJobs, outro procura notícias reais sobre tecnologia interativa. Nada aqui é inventado nem pré-preenchido.</p>
+        <div class="heroi-botoes">
+            <a href="/dashboard" class="botao botao-primario">Abrir o painel completo</a>
+            <a href="https://github.com/elisamanuel-on/monitor-vagas-noticias" class="botao botao-secundario" target="_blank" rel="noopener">Ver o código →</a>
+        </div>
+        <div class="heroi-stats" id="heroiStats">
+            <div class="heroi-stat"><b class="mono" id="statVagas">—</b><span>vagas encontradas</span></div>
+            <div class="heroi-stat"><b class="mono" id="statNoticias">—</b><span>notícias recolhidas</span></div>
+            <div class="heroi-stat"><b class="mono" id="statFontes">2</b><span>fontes automáticas</span></div>
+            <div class="heroi-stat"><b class="mono" id="statAtualizado">—</b><span>última recolha</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="bloco container">
+    <p class="rotulo-secao">Ao vivo</p>
+    <h2 class="titulo-secao">O que o robô encontrou mais recentemente</h2>
+    <p class="intro-secao">Uma amostra das vagas e notícias mais recentes, tal como estão guardadas na base de dados agora mesmo.</p>
+
+    <div class="carrossel" id="carrossel">
+        <div class="carrossel-trilho" id="carrosselTrilho">
+            <div class="carrossel-estado-vazio">A carregar…</div>
+        </div>
+    </div>
+    <div class="carrossel-pontos" id="carrosselPontos"></div>
+</section>
+
+<section class="bloco container">
+    <p class="rotulo-secao">Como funciona</p>
+    <h2 class="titulo-secao">Sem cliques, sem esquecimentos</h2>
+    <p class="intro-secao">O painel completo, com filtros e acompanhamento de candidaturas, fica por trás. Esta vitrine mostra só o essencial: prova de que os dados são mesmo reais.</p>
+    <div class="grelha-funcionalidades">
+        <div class="cartao-funcionalidade">
+            <div class="icone-func">01</div>
+            <h3>Recolha diária automática</h3>
+            <p>Um agendamento no GitHub Actions corre os dois robôs todas as manhãs, sem precisar de estar ligada a nenhum computador.</p>
+        </div>
+        <div class="cartao-funcionalidade">
+            <div class="icone-func">02</div>
+            <h3>Nunca perde o que já classificaste</h3>
+            <p>Se já marcaste uma vaga como "candidatei-me", uma nova recolha nunca apaga essa decisão.</p>
+        </div>
+        <div class="cartao-funcionalidade">
+            <div class="icone-func">03</div>
+            <h3>Filtros por localização, fonte e data</h3>
+            <p>No painel completo dá para procurar por texto, período, localização e estado da candidatura.</p>
+        </div>
+    </div>
+</section>
+
+<footer class="rodape">
+    <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a></p>
+</footer>
+
+<script>
+(function () {
+    "use strict";
+
+    function formatarData(isoString) {
+        if (!isoString) return "";
+        const data = new Date(isoString);
+        if (Number.isNaN(data.getTime())) return "";
+        return data.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    function formatarHora(isoString) {
+        if (!isoString) return "—";
+        const data = new Date(isoString);
+        if (Number.isNaN(data.getTime())) return "—";
+        return data.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" }) + ", " +
+            data.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    async function pedirJSON(url) {
+        const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error("Pedido falhou (" + resposta.status + ") a " + url);
+        return resposta.json();
+    }
+
+    async function carregarStats() {
+        try {
+            const resumo = await pedirJSON("/api/resumo");
+            document.getElementById("statVagas").textContent = resumo.total_vagas ?? "—";
+            document.getElementById("statNoticias").textContent = resumo.total_noticias ?? "—";
+            document.getElementById("statAtualizado").textContent = formatarHora(resumo.atualizado_em);
+        } catch (erro) {
+            console.error("Não foi possível carregar o resumo", erro);
+            document.getElementById("statAtualizado").textContent = "indisponível";
+        }
+    }
+
+    function cartaoVaga(vaga) {
+        const localizacoes = (vaga.localizacoes || []).join(", ") || "Localização não indicada";
+        const div = document.createElement("div");
+        div.className = "carrossel-cartao";
+        div.innerHTML =
+            '<div class="carrossel-topo">' +
+                '<span class="etiqueta-tipo vaga">Vaga</span>' +
+                '<span class="etiqueta-fonte">' + escaparHTML(vaga.fonte || "") + "</span>" +
+            "</div>" +
+            "<h3>" + escaparHTML(vaga.titulo || "Vaga sem título") + "</h3>" +
+            "<p>" + escaparHTML(vaga.empresa || "Empresa não indicada") + " · " + escaparHTML(localizacoes) + "</p>" +
+            '<span class="quando">Publicada em ' + escaparHTML(formatarData(vaga.publicado_em) || "data não indicada") + "</span>";
+        if (vaga.link) {
+            const link = document.createElement("a");
+            link.href = vaga.link;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.className = "botao botao-secundario";
+            link.style.cssText = "align-self:flex-start;color:var(--azul-700);border-color:var(--borda);padding:8px 16px;font-size:12.5px;margin-top:4px;";
+            link.textContent = "Ver vaga →";
+            div.appendChild(link);
+        }
+        return div;
+    }
+
+    function cartaoNoticia(noticia) {
+        const div = document.createElement("div");
+        div.className = "carrossel-cartao";
+        const resumo = (noticia.resumo || "").replace(/<[^>]*>/g, "");
+        div.innerHTML =
+            '<div class="carrossel-topo">' +
+                '<span class="etiqueta-tipo noticia">Notícia</span>' +
+                '<span class="etiqueta-fonte">' + escaparHTML(noticia.fonte || "") + "</span>" +
+            "</div>" +
+            "<h3>" + escaparHTML(noticia.titulo || "Notícia sem título") + "</h3>" +
+            (resumo ? "<p>" + escaparHTML(resumo.slice(0, 140)) + (resumo.length > 140 ? "…" : "") + "</p>" : "") +
+            '<span class="quando">Publicada em ' + escaparHTML(formatarData(noticia.publicado_em) || "data não indicada") + "</span>";
+        if (noticia.link) {
+            const link = document.createElement("a");
+            link.href = noticia.link;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.className = "botao botao-secundario";
+            link.style.cssText = "align-self:flex-start;color:var(--azul-700);border-color:var(--borda);padding:8px 16px;font-size:12.5px;margin-top:4px;";
+            link.textContent = "Ler notícia →";
+            div.appendChild(link);
+        }
+        return div;
+    }
+
+    function escaparHTML(texto) {
+        const div = document.createElement("div");
+        div.textContent = texto;
+        return div.innerHTML;
+    }
+
+    let indiceAtual = 0;
+    let itensCarrossel = [];
+    let temporizadorCarrossel = null;
+
+    function irParaSlide(indice) {
+        const trilho = document.getElementById("carrosselTrilho");
+        const pontos = document.getElementById("carrosselPontos").querySelectorAll(".ponto");
+        indiceAtual = (indice + itensCarrossel.length) % itensCarrossel.length;
+        trilho.style.transform = "translateX(-" + (indiceAtual * 100) + "%)";
+        pontos.forEach((ponto, i) => {
+            ponto.setAttribute("aria-current", i === indiceAtual ? "true" : "false");
+        });
+    }
+
+    function iniciarAutoplay() {
+        if (temporizadorCarrossel) clearInterval(temporizadorCarrossel);
+        if (itensCarrossel.length < 2) return;
+        temporizadorCarrossel = setInterval(() => irParaSlide(indiceAtual + 1), 6000);
+    }
+
+    function montarCarrossel(vagas, noticias) {
+        const trilho = document.getElementById("carrosselTrilho");
+        const pontosContentor = document.getElementById("carrosselPontos");
+        trilho.innerHTML = "";
+        pontosContentor.innerHTML = "";
+
+        const cartoes = [];
+        const maxItens = 3;
+        for (let i = 0; i < maxItens; i++) {
+            if (vagas[i]) cartoes.push(cartaoVaga(vagas[i]));
+            if (noticias[i]) cartoes.push(cartaoNoticia(noticias[i]));
+        }
+        itensCarrossel = cartoes;
+
+        if (cartoes.length === 0) {
+            trilho.innerHTML = '<div class="carrossel-estado-vazio">Sem vagas ou notícias recolhidas ainda hoje.</div>';
+            return;
+        }
+
+        cartoes.forEach((cartao, i) => {
+            trilho.appendChild(cartao);
+            const ponto = document.createElement("button");
+            ponto.className = "ponto";
+            ponto.setAttribute("aria-label", "Ir para o item " + (i + 1));
+            ponto.setAttribute("aria-current", i === 0 ? "true" : "false");
+            ponto.addEventListener("click", () => { irParaSlide(i); iniciarAutoplay(); });
+            pontosContentor.appendChild(ponto);
+        });
+
+        const carrosselEl = document.getElementById("carrossel");
+        carrosselEl.addEventListener("mouseenter", () => temporizadorCarrossel && clearInterval(temporizadorCarrossel));
+        carrosselEl.addEventListener("mouseleave", iniciarAutoplay);
+
+        iniciarAutoplay();
+    }
+
+    async function carregarCarrossel() {
+        try {
+            const [vagas, noticias] = await Promise.all([
+                pedirJSON("/api/vagas?periodo=30d"),
+                pedirJSON("/api/noticias?periodo=30d"),
+            ]);
+            montarCarrossel(vagas, noticias);
+        } catch (erro) {
+            console.error("Não foi possível carregar o carrossel", erro);
+            document.getElementById("carrosselTrilho").innerHTML =
+                '<div class="carrossel-estado-erro">Não foi possível carregar os dados agora. Tenta novamente daqui a pouco.</div>';
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        carregarStats();
+        carregarCarrossel();
+    });
+})();
+</script>
+</body>
+</html>

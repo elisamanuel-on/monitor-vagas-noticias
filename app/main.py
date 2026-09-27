@@ -172,4 +172,11 @@ app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="stat
 
 @app.get("/")
 def raiz():
+    """Vitrine pública: apresentação do projeto com dados reais em destaque."""
+    return FileResponse(str(BASE_DIR / "static" / "vitrine.html"))
+
+
+@app.get("/dashboard")
+def painel():
+    """Painel de trabalho completo, com filtros e gestão de candidaturas."""
     return FileResponse(str(BASE_DIR / "static" / "index.html"))
