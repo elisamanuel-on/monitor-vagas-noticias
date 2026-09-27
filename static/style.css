@@ -1,32 +1,40 @@
-/* Monitor de Vagas & Notícias — identidade visual própria: claro, "SaaS de
-   dados", tipografia sem serifa. Propositadamente diferente do tema
-   dark-terminal-verde do Controlo de Gastos, para mostrar versatilidade. */
+/* Monitor de Vagas & Notícias — painel de trabalho, agora com a mesma
+   identidade "Azul Editorial" da vitrine pública (mesmos tokens de
+   static/vitrine.css), para as duas páginas parecerem o mesmo produto. */
 
 :root {
-    --cor-fundo: #f5f6fb;
-    --cor-superficie: #ffffff;
-    --cor-borda: #e4e6f1;
-    --cor-texto: #1f2333;
-    --cor-texto-suave: #6b7085;
-    --cor-primaria: #4f46e5;
-    --cor-primaria-suave: #eef0fd;
-    --cor-sucesso: #0d9488;
-    --cor-sucesso-suave: #e6f7f5;
-    --cor-aviso: #d97706;
-    --cor-aviso-suave: #fdf1e2;
+    --azul-700: #1f4d82;
+    --azul-900: #13294b;
+    --azul-suave: #e2eaf5;
+    --acento: #c96a2e;
+    --acento-suave: #f7e6d9;
+    --fundo: #f4f6fa;
+    --superficie: #ffffff;
+    --borda: #dbe3ee;
+    --texto: #16213a;
+    --texto-suave: #51607a;
+    --texto-fraco: #8793a8;
+    --sucesso: #0d9488;
+    --sucesso-suave: #e6f7f5;
+    --aviso: #a8641f;
+    --aviso-suave: #f6ead9;
     --raio: 14px;
-    --sombra: 0 1px 2px rgba(31, 35, 51, 0.04), 0 8px 24px rgba(31, 35, 51, 0.06);
+    --sombra: 0 1px 2px rgba(19,41,75,.06), 0 8px 24px rgba(19,41,75,.08);
 }
 
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-    background: var(--cor-fundo);
-    color: var(--cor-texto);
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
     line-height: 1.5;
 }
+
+h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
+
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
 .container {
     max-width: 980px;
@@ -35,15 +43,15 @@ body {
 }
 
 .topo {
-    background: var(--cor-superficie);
-    border-bottom: 1px solid var(--cor-borda);
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borda);
 }
 
 .topo-conteudo {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 14px 20px;
     flex-wrap: wrap;
     gap: 8px;
 }
@@ -51,25 +59,27 @@ body {
 .marca {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 600;
+    gap: 9px;
+    text-decoration: none;
 }
 
-.marca-ponto {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--cor-primaria);
-    display: inline-block;
+.marca img { width: 28px; height: 28px; }
+
+.marca-nome {
+    font-family: "Lexend", sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--texto);
 }
 
 .link-portfolio {
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
     text-decoration: none;
     font-size: 0.9rem;
+    border-bottom: 1px solid transparent;
 }
 
-.link-portfolio:hover { color: var(--cor-primaria); }
+.link-portfolio:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
 
 .intro {
     padding: 40px 0 8px;
@@ -78,11 +88,11 @@ body {
 .intro h1 {
     margin: 0 0 10px;
     font-size: 2rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
 }
 
 .intro-texto {
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
     max-width: 62ch;
     margin: 0;
 }
@@ -95,8 +105,8 @@ body {
 }
 
 .card-resumo {
-    background: var(--cor-superficie);
-    border: 1px solid var(--cor-borda);
+    background: var(--superficie);
+    border: 1px solid var(--borda);
     border-radius: var(--raio);
     padding: 16px 18px;
     display: flex;
@@ -106,24 +116,26 @@ body {
 }
 
 .card-resumo-destaque {
-    border-color: var(--cor-primaria);
-    background: var(--cor-primaria-suave);
+    border-color: var(--azul-700);
+    background: var(--azul-suave);
 }
 
 .card-resumo-valor {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
     font-size: 1.6rem;
     font-weight: 700;
 }
 
 .card-resumo-label {
     font-size: 0.82rem;
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
 }
 
 .abas {
     display: flex;
     gap: 4px;
-    border-bottom: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--borda);
     margin-bottom: 20px;
 }
 
@@ -136,13 +148,16 @@ body {
     margin-right: 20px;
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
     cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
 }
 
-.aba-ativa {
-    color: var(--cor-primaria);
-    border-bottom-color: var(--cor-primaria);
+.aba:hover { color: var(--azul-700); }
+
+.aba-ativa, .aba-ativa:hover {
+    color: var(--azul-700);
+    border-bottom-color: var(--azul-700);
 }
 
 .filtros {
@@ -157,9 +172,16 @@ body {
     font-size: 0.9rem;
     padding: 9px 12px;
     border-radius: 10px;
-    border: 1px solid var(--cor-borda);
-    background: var(--cor-superficie);
-    color: var(--cor-texto);
+    border: 1px solid var(--borda);
+    background: var(--superficie);
+    color: var(--texto);
+    transition: border-color .15s ease;
+}
+
+.filtros input:focus-visible, .filtros select:focus-visible {
+    outline: 2px solid var(--azul-700);
+    outline-offset: 1px;
+    border-color: var(--azul-700);
 }
 
 .filtros input[type="search"] {
@@ -174,20 +196,25 @@ body {
 }
 
 .estado-vazio {
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
     padding: 24px;
     text-align: center;
-    background: var(--cor-superficie);
-    border: 1px dashed var(--cor-borda);
+    background: var(--superficie);
+    border: 1px dashed var(--borda);
     border-radius: var(--raio);
 }
 
 .cartao-vaga, .cartao-noticia {
-    background: var(--cor-superficie);
-    border: 1px solid var(--cor-borda);
+    background: var(--superficie);
+    border: 1px solid var(--borda);
     border-radius: var(--raio);
     padding: 16px 18px;
     box-shadow: var(--sombra);
+    transition: box-shadow .18s ease, border-color .18s ease;
+}
+
+.cartao-vaga:hover, .cartao-noticia:hover {
+    border-color: var(--azul-700);
 }
 
 .cartao-vaga-cabecalho {
@@ -200,49 +227,54 @@ body {
 .cartao-vaga-cabecalho h3 {
     margin: 0;
     font-size: 1.05rem;
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
 }
 
+/* Pílulas de estado — mesmas cores usadas no guia de identidade */
 .etiqueta-estado {
     font-size: 0.75rem;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 999px;
     white-space: nowrap;
-    background: var(--cor-aviso-suave);
-    color: var(--cor-aviso);
+    background: var(--aviso-suave);
+    color: var(--aviso);
 }
 
 .etiqueta-estado[data-estado="candidatei_me"] {
-    background: var(--cor-primaria-suave);
-    color: var(--cor-primaria);
+    background: var(--fundo);
+    color: var(--azul-700);
+    border: 1px solid var(--borda);
 }
 
 .etiqueta-estado[data-estado="resposta_recebida"] {
-    background: var(--cor-sucesso-suave);
-    color: var(--cor-sucesso);
+    background: var(--sucesso-suave);
+    color: var(--sucesso);
 }
 
 .etiqueta-estado[data-estado="arquivada"] {
-    background: #f1f1f4;
-    color: var(--cor-texto-suave);
+    background: var(--borda);
+    color: var(--texto-fraco);
 }
 
 .cartao-vaga-empresa {
     margin: 4px 0 2px;
     font-weight: 600;
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
 }
 
 .etiqueta-fonte {
     display: inline-block;
     margin-bottom: 8px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: var(--cor-texto-suave);
-    background: var(--cor-fundo);
-    border: 1px solid var(--cor-borda);
+    color: var(--texto-suave);
+    background: var(--fundo);
+    border: 1px solid var(--borda);
     border-radius: 999px;
     padding: 2px 9px;
 }
@@ -250,7 +282,7 @@ body {
 .cartao-vaga-detalhes {
     margin: 0 0 12px;
     font-size: 0.88rem;
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
 }
 
 .cartao-vaga-rodape {
@@ -262,7 +294,7 @@ body {
 }
 
 .cartao-vaga-link {
-    color: var(--cor-primaria);
+    color: var(--azul-700);
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -275,51 +307,68 @@ body {
     font-size: 0.85rem;
     padding: 6px 10px;
     border-radius: 8px;
-    border: 1px solid var(--cor-borda);
-    background: var(--cor-fundo);
+    border: 1px solid var(--borda);
+    background: var(--fundo);
+    transition: border-color .15s ease;
+}
+
+.seletor-estado:focus-visible {
+    outline: 2px solid var(--azul-700);
+    outline-offset: 1px;
+    border-color: var(--azul-700);
 }
 
 .cartao-noticia-fonte {
     margin: 0 0 4px;
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--cor-primaria);
+    color: var(--sucesso);
 }
 
 .cartao-noticia h3 {
     margin: 0 0 6px;
     font-size: 1.02rem;
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
 }
 
 .cartao-noticia h3 a {
-    color: var(--cor-texto);
+    color: var(--texto);
     text-decoration: none;
 }
 
-.cartao-noticia h3 a:hover { color: var(--cor-primaria); }
+.cartao-noticia h3 a:hover { color: var(--azul-700); }
 
 .cartao-noticia-resumo {
     margin: 0 0 8px;
-    color: var(--cor-texto-suave);
+    color: var(--texto-suave);
     font-size: 0.9rem;
 }
 
 .cartao-noticia-data {
     margin: 0;
     font-size: 0.78rem;
-    color: var(--cor-texto-suave);
+    color: var(--texto-fraco);
 }
 
 .rodape {
     text-align: center;
     padding: 24px 20px 40px;
-    color: var(--cor-texto-suave);
+    color: var(--texto-fraco);
     font-size: 0.85rem;
 }
 
-.rodape a { color: var(--cor-primaria); }
+.rodape a { color: var(--azul-700); text-decoration: none; }
+.rodape a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+    .aba, .filtros input, .filtros select, .cartao-vaga, .cartao-noticia, .seletor-estado {
+        transition: none;
+    }
+}
 
 @media (max-width: 480px) {
     .intro h1 { font-size: 1.6rem; }
