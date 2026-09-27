@@ -94,9 +94,23 @@ a { color: inherit; }
     margin-bottom: 18px;
 }
 .heroi-ponto {
+    position: relative;
     width: 7px; height: 7px; border-radius: 999px;
     background: #5eead4;
-    box-shadow: 0 0 0 3px rgba(94,234,212,.25);
+    flex-shrink: 0;
+}
+.heroi-ponto::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 999px;
+    border: 1.5px solid #5eead4;
+    animation: pulsoAoVivo 2.2s ease-out infinite;
+}
+@keyframes pulsoAoVivo {
+    0%   { transform: scale(.4); opacity: .9; }
+    75%  { transform: scale(1.9); opacity: 0; }
+    100% { transform: scale(1.9); opacity: 0; }
 }
 .heroi h1 {
     font-size: clamp(28px, 4.4vw, 42px);
@@ -283,10 +297,11 @@ p.intro-secao { color: var(--texto-suave); font-size: 15px; line-height: 1.6; ma
 
 @media (prefers-reduced-motion: reduce) {
     .carrossel-trilho { transition: none; }
-    .botao, .ponto, .cartao-funcionalidade, .icone-lupa { transition: none !important; animation: none !important; }
+    .botao, .ponto, .cartao-funcionalidade, .icone-lupa, .heroi-ponto::before { transition: none !important; animation: none !important; }
     .botao:active { transform: none; }
     .ponto:hover { transform: none; }
     .cartao-funcionalidade:hover { transform: none; }
+    .heroi-ponto::before { opacity: 0; }
 }
 
 @media (max-width: 560px) {

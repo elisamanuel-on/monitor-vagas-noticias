@@ -109,11 +109,32 @@
         return resposta.json();
     }
 
+    const prefereMenosMovimentoGlobal = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function animarNumero(elemento, valorFinal) {
+        if (!elemento) return;
+        const alvo = Number(valorFinal);
+        if (!Number.isFinite(alvo) || prefereMenosMovimentoGlobal) {
+            elemento.textContent = valorFinal ?? "—";
+            return;
+        }
+        const duracao = 700;
+        const inicio = performance.now();
+        function passo(agora) {
+            const progresso = Math.min((agora - inicio) / duracao, 1);
+            const suavizado = 1 - Math.pow(1 - progresso, 3);
+            elemento.textContent = Math.round(alvo * suavizado);
+            if (progresso < 1) requestAnimationFrame(passo);
+            else elemento.textContent = alvo;
+        }
+        requestAnimationFrame(passo);
+    }
+
     async function carregarStats() {
         try {
             const resumo = await pedirJSON("/api/resumo");
-            document.getElementById("statVagas").textContent = resumo.total_vagas ?? "—";
-            document.getElementById("statNoticias").textContent = resumo.total_noticias ?? "—";
+            animarNumero(document.getElementById("statVagas"), resumo.total_vagas);
+            animarNumero(document.getElementById("statNoticias"), resumo.total_noticias);
             document.getElementById("statAtualizado").textContent = formatarHora(resumo.atualizado_em);
         } catch (erro) {
             console.error("Não foi possível carregar o resumo", erro);

@@ -365,9 +365,27 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .rodape a { color: var(--azul-700); text-decoration: none; }
 .rodape a:hover { text-decoration: underline; }
 
+/* Celebração ao marcar uma vaga como "Com resposta" */
+@keyframes estadoPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.18); }
+    70%  { transform: scale(.96); }
+    100% { transform: scale(1); }
+}
+.etiqueta-estado.a-celebrar { animation: estadoPop .5s cubic-bezier(.34, 1.56, .64, 1); }
+
+@keyframes cartaoBrilho {
+    0%   { box-shadow: 0 0 0 0 rgba(13, 148, 136, .35), var(--sombra); }
+    100% { box-shadow: 0 0 0 14px rgba(13, 148, 136, 0), var(--sombra); }
+}
+.cartao-vaga.a-celebrar { animation: cartaoBrilho 1s ease-out; }
+
 @media (prefers-reduced-motion: reduce) {
     .aba, .filtros input, .filtros select, .cartao-vaga, .cartao-noticia, .seletor-estado {
         transition: none;
+    }
+    .etiqueta-estado.a-celebrar, .cartao-vaga.a-celebrar {
+        animation: none;
     }
 }
 

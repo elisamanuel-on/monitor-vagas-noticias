@@ -25,14 +25,35 @@ async function pedirJSON(url, opcoes) {
 
 // ---------- Resumo ----------
 
+const prefereMenosMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function animarNumero(elemento, valorFinal) {
+    if (!elemento) return;
+    const alvo = Number(valorFinal);
+    if (!Number.isFinite(alvo) || prefereMenosMovimento) {
+        elemento.textContent = valorFinal;
+        return;
+    }
+    const duracao = 700;
+    const inicio = performance.now();
+    function passo(agora) {
+        const progresso = Math.min((agora - inicio) / duracao, 1);
+        const suavizado = 1 - Math.pow(1 - progresso, 3);
+        elemento.textContent = Math.round(alvo * suavizado);
+        if (progresso < 1) requestAnimationFrame(passo);
+        else elemento.textContent = alvo;
+    }
+    requestAnimationFrame(passo);
+}
+
 async function carregarResumo() {
     try {
         const resumo = await pedirJSON('/api/resumo');
-        document.getElementById('resumoTotalVagas').textContent = resumo.total_vagas;
-        document.getElementById('resumoPorCandidatar').textContent = resumo.vagas_por_candidatar;
-        document.getElementById('resumoCandidateiMe').textContent = resumo.vagas_candidatei_me;
-        document.getElementById('resumoRespostaRecebida').textContent = resumo.vagas_resposta_recebida;
-        document.getElementById('resumoTotalNoticias').textContent = resumo.total_noticias;
+        animarNumero(document.getElementById('resumoTotalVagas'), resumo.total_vagas);
+        animarNumero(document.getElementById('resumoPorCandidatar'), resumo.vagas_por_candidatar);
+        animarNumero(document.getElementById('resumoCandidateiMe'), resumo.vagas_candidatei_me);
+        animarNumero(document.getElementById('resumoRespostaRecebida'), resumo.vagas_resposta_recebida);
+        animarNumero(document.getElementById('resumoTotalNoticias'), resumo.total_noticias);
     } catch (erro) {
         console.error('Não foi possível carregar o resumo', erro);
     }
@@ -65,12 +86,12 @@ function construirCartaoVaga(vaga) {
 
     const seletor = cartao.querySelector('.seletor-estado');
     seletor.value = vaga.estado;
-    seletor.addEventListener('change', () => atualizarEstadoVaga(vaga.id, seletor.value, etiqueta));
+    seletor.addEventListener('change', () => atualizarEstadoVaga(vaga.id, seletor.value, etiqueta, cartao));
 
     return cartao;
 }
 
-async function atualizarEstadoVaga(vagaId, novoEstado, elementoEtiqueta) {
+async function atualizarEstadoVaga(vagaId, novoEstado, elementoEtiqueta, elementoCartao) {
     try {
         await pedirJSON(`/api/vagas/${vagaId}`, {
             method: 'PATCH',
@@ -80,6 +101,17 @@ async function atualizarEstadoVaga(vagaId, novoEstado, elementoEtiqueta) {
         elementoEtiqueta.textContent = ESTADOS_LABEL[novoEstado] || novoEstado;
         elementoEtiqueta.dataset.estado = novoEstado;
         carregarResumo();
+
+        // Uma resposta a uma candidatura é a melhor notícia deste painel —
+        // merece um pequeno destaque, não só uma mudança silenciosa de cor.
+        if (novoEstado === 'resposta_recebida' && elementoCartao) {
+            elementoCartao.classList.add('a-celebrar');
+            elementoEtiqueta.classList.add('a-celebrar');
+            setTimeout(() => {
+                elementoCartao.classList.remove('a-celebrar');
+                elementoEtiqueta.classList.remove('a-celebrar');
+            }, 1000);
+        }
     } catch (erro) {
         console.error('Não foi possível atualizar o estado da vaga', erro);
         alert('Não foi possível guardar esta alteração. Tenta novamente.');
