@@ -7,12 +7,12 @@
     <meta name="description" content="Painel pessoal que acompanha vagas de emprego reais e notícias do setor de tecnologia interativa, recolhidas automaticamente.">
     <link rel="icon" type="image/svg+xml" href="/static/logo-mark.svg">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
     <header class="topo">
         <div class="container topo-conteudo">
-            <a href="/" class="marca">
+            <a href="/" class="marca" id="linkLogoMonitor">
                 <img src="/static/logo-mark.svg" alt="">
                 <span class="marca-nome">Monitor</span>
             </a>
@@ -143,6 +143,25 @@
         </article>
     </template>
 
-    <script src="/static/script.js"></script>
+    <script src="/static/script.js?v=2"></script>
+    <script>
+        // O logótipo "Monitor" força sempre uma ida a buscar a página nova ao
+        // servidor (como um F5), para nunca mostrar uma versão antiga guardada
+        // pelo browser desta página, visto que este endereço já existiu com
+        // outro aspeto no passado.
+        (function () {
+            var logo = document.getElementById("linkLogoMonitor");
+            if (!logo) return;
+            logo.addEventListener("click", function (evento) {
+                var cliqueSimples = evento.button === 0 &&
+                    !evento.metaKey && !evento.ctrlKey && !evento.shiftKey && !evento.altKey;
+                if (!cliqueSimples) return;
+                evento.preventDefault();
+                var destino = logo.getAttribute("href") || "/";
+                var separador = destino.indexOf("?") === -1 ? "?" : "&";
+                window.location.href = destino + separador + "atualizar=" + Date.now();
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -62,6 +62,7 @@ a { color: inherit; }
     gap: 9px;
     text-decoration: none;
 }
+.marca, .marca:link, .marca:visited, .marca:hover, .marca:active { text-decoration: none; }
 .marca img { width: 30px; height: 30px; }
 .marca-nome { font-family: "Lexend", sans-serif; font-weight: 700; font-size: 17px; color: var(--texto); }
 .link-portfolio {

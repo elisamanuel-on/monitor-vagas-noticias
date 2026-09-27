@@ -170,13 +170,16 @@ def resumo():
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 
+_SEM_CACHE = {"Cache-Control": "no-cache"}
+
+
 @app.get("/")
 def raiz():
     """Vitrine pública: apresentação do projeto com dados reais em destaque."""
-    return FileResponse(str(BASE_DIR / "static" / "vitrine.html"))
+    return FileResponse(str(BASE_DIR / "static" / "vitrine.html"), headers=_SEM_CACHE)
 
 
 @app.get("/dashboard")
 def painel():
     """Painel de trabalho completo, com filtros e gestão de candidaturas."""
-    return FileResponse(str(BASE_DIR / "static" / "index.html"))
+    return FileResponse(str(BASE_DIR / "static" / "index.html"), headers=_SEM_CACHE)
