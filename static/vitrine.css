@@ -123,11 +123,24 @@ a { color: inherit; }
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    transition: transform .12s ease, filter .15s ease, background .15s ease;
 }
+.botao:active { transform: scale(.96); }
 .botao-primario { background: var(--acento); color: #201105; }
 .botao-primario:hover { filter: brightness(1.06); }
 .botao-secundario { background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff; }
 .botao-secundario:hover { background: rgba(255,255,255,.08); }
+
+.icone-lupa { flex-shrink: 0; }
+.icone-lupa.a-saltar { animation: lupaPisadaSalto .5s cubic-bezier(.34, 1.56, .64, 1); }
+
+@keyframes lupaPisadaSalto {
+    0%   { transform: scale(1) rotate(0deg); }
+    25%  { transform: scale(.7) rotate(-10deg); }
+    55%  { transform: scale(1.28) rotate(6deg); }
+    75%  { transform: scale(.94) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
 
 .heroi-stats {
     display: grid;
@@ -214,8 +227,11 @@ p.intro-secao { color: var(--texto-suave); font-size: 15px; line-height: 1.6; ma
     border: none;
     padding: 0;
     cursor: pointer;
+    transition: width .25s ease, transform .15s ease, background .15s ease;
 }
-.ponto[aria-current="true"] { background: var(--azul-700); width: 20px; border-radius: 999px; transition: width .25s ease; }
+.ponto:hover { transform: scale(1.4); }
+.ponto[aria-current="true"] { background: var(--azul-700); width: 20px; border-radius: 999px; }
+.ponto[aria-current="true"]:hover { transform: none; }
 
 .carrossel-estado-vazio, .carrossel-estado-erro {
     padding: 40px 28px;
@@ -235,6 +251,12 @@ p.intro-secao { color: var(--texto-suave); font-size: 15px; line-height: 1.6; ma
     border: 1px solid var(--borda);
     border-radius: var(--raio);
     padding: 20px 20px 22px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.cartao-funcionalidade:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra);
+    border-color: var(--azul-700);
 }
 .cartao-funcionalidade .icone-func {
     width: 38px; height: 38px;
@@ -260,6 +282,10 @@ p.intro-secao { color: var(--texto-suave); font-size: 15px; line-height: 1.6; ma
 
 @media (prefers-reduced-motion: reduce) {
     .carrossel-trilho { transition: none; }
+    .botao, .ponto, .cartao-funcionalidade, .icone-lupa { transition: none !important; animation: none !important; }
+    .botao:active { transform: none; }
+    .ponto:hover { transform: none; }
+    .cartao-funcionalidade:hover { transform: none; }
 }
 
 @media (max-width: 560px) {

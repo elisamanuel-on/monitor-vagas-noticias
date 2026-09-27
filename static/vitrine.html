@@ -26,7 +26,13 @@
         <h1>Vagas de emprego e notícias do setor, recolhidas sozinhas todas as manhãs</h1>
         <p class="sub">Dois robôs em Python correm automaticamente todos os dias: um vai buscar vagas reais à API da ITJobs, outro procura notícias reais sobre tecnologia interativa. Nada aqui é inventado nem pré-preenchido.</p>
         <div class="heroi-botoes">
-            <a href="/dashboard" class="botao botao-primario">Abrir o painel completo</a>
+            <a href="/dashboard" class="botao botao-primario" id="botaoAbrirSistema">
+                <svg class="icone-lupa" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <circle cx="10" cy="10" r="6.2" fill="none" stroke="currentColor" stroke-width="2.4"/>
+                    <line x1="14.7" y1="14.7" x2="20" y2="20" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+                </svg>
+                Abrir o painel completo
+            </a>
             <a href="https://github.com/elisamanuel-on/monitor-vagas-noticias" class="botao botao-secundario" target="_blank" rel="noopener">Ver o código →</a>
         </div>
         <div class="heroi-stats" id="heroiStats">
@@ -241,9 +247,32 @@
         }
     }
 
+    // ---------- Interação: lupa a saltar ao abrir o sistema ----------
+
+    function configurarBotaoSistema() {
+        const botao = document.getElementById("botaoAbrirSistema");
+        const icone = botao && botao.querySelector(".icone-lupa");
+        if (!botao || !icone) return;
+
+        const prefereMenosMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        botao.addEventListener("click", (evento) => {
+            const cliqueSimples = evento.button === 0 &&
+                !evento.metaKey && !evento.ctrlKey && !evento.shiftKey && !evento.altKey;
+            if (!cliqueSimples || prefereMenosMovimento) return; // deixa o browser tratar (nova aba, etc.)
+
+            evento.preventDefault();
+            icone.classList.remove("a-saltar");
+            void icone.offsetWidth; // reinicia a animação se o clique for repetido depressa
+            icone.classList.add("a-saltar");
+            window.setTimeout(() => { window.location.href = botao.href; }, 420);
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         carregarStats();
         carregarCarrossel();
+        configurarBotaoSistema();
     });
 })();
 </script>
