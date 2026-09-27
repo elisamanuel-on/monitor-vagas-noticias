@@ -16,9 +16,19 @@
                 <img src="/static/logo-mark.svg" alt="">
                 <span class="marca-nome">Monitor</span>
             </a>
-            <a href="https://elisamanuel-on.github.io/portfolio.html" class="link-portfolio">← Portfólio de Elisama Manuel</a>
+            <a href="https://elisamanuel-on.github.io/portfolio.html" class="link-portfolio" id="linkPortfolio">← Portfólio de Elisama Manuel</a>
         </div>
     </header>
+    <script>
+        // No executável de secretária o painel abre com "?modo=app" no
+        // endereço — aí não faz sentido mostrar um link de volta ao
+        // portfólio do site, porque isto já não está a ser visto num
+        // browser a navegar pelo site.
+        if (new URLSearchParams(location.search).get("modo") === "app") {
+            var linkPortfolio = document.getElementById("linkPortfolio");
+            if (linkPortfolio) linkPortfolio.remove();
+        }
+    </script>
 
     <main class="container">
         <section class="intro">
