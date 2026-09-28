@@ -213,8 +213,10 @@ def _distribuicao(colecao, campo: str, limite: int, e_lista: bool = False) -> li
 @app.get("/api/estatisticas")
 def estatisticas():
     """Números mais ricos para a aba 'Estatísticas' do painel: evolução no
-    tempo, distribuição por termo/localização/fonte e taxa de resposta."""
+    tempo, distribuição por termo/localização/fonte (vagas e notícias) e
+    taxa de resposta."""
     vagas = get_vagas_collection()
+    noticias = get_noticias_collection()
 
     candidatadas = vagas.count_documents(
         {"estado": {"$in": ["candidatei_me", "resposta_recebida"]}}
@@ -227,6 +229,7 @@ def estatisticas():
         "por_termo": _distribuicao(vagas, "termo_origem", limite=12),
         "por_localizacao": _distribuicao(vagas, "localizacoes", limite=10, e_lista=True),
         "por_fonte": _distribuicao(vagas, "fonte", limite=10),
+        "por_fonte_noticias": _distribuicao(noticias, "fonte", limite=10),
         "taxa_resposta": {
             "candidatadas": candidatadas,
             "com_resposta": com_resposta,

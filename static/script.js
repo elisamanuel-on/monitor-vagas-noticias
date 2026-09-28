@@ -434,6 +434,30 @@ function desenharBarras(canvas, dados) {
     });
 }
 
+function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+function preencherListaFontes(idContentor, dados, cor) {
+    const contentor = document.getElementById(idContentor);
+    if (!contentor) return;
+    if (!dados || !dados.length) {
+        contentor.innerHTML = '<p class="estado-vazio">Ainda não há dados suficientes.</p>';
+        return;
+    }
+    contentor.innerHTML = dados
+        .map((item) => `
+            <div class="linha-fonte">
+                <i class="ponto-legenda" style="background:${cor}"></i>
+                <span class="linha-fonte-nome">${escaparHtml(String(item.chave))}</span>
+                <span class="linha-fonte-total">${item.total}</span>
+            </div>
+        `)
+        .join('');
+}
+
 function desenharTaxaResposta(dados) {
     const contentor = document.getElementById('taxaResposta');
     if (!contentor) return;
@@ -457,7 +481,8 @@ function desenharGraficosEstatisticas() {
     desenharEvolucao(document.getElementById('graficoEvolucao'), ultimosDadosEstatisticas.evolucao);
     desenharBarras(document.getElementById('graficoTermos'), ultimosDadosEstatisticas.por_termo);
     desenharBarras(document.getElementById('graficoLocalizacoes'), ultimosDadosEstatisticas.por_localizacao);
-    desenharBarras(document.getElementById('graficoFontes'), ultimosDadosEstatisticas.por_fonte);
+    preencherListaFontes('fontesVagas', ultimosDadosEstatisticas.por_fonte, corVar('--azul-700'));
+    preencherListaFontes('fontesNoticias', ultimosDadosEstatisticas.por_fonte_noticias, corVar('--acento'));
     desenharTaxaResposta(ultimosDadosEstatisticas.taxa_resposta);
 }
 

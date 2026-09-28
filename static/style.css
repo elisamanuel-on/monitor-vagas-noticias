@@ -491,6 +491,40 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
     color: var(--texto-suave);
 }
 
+.lista-fontes {
+    display: flex;
+    flex-direction: column;
+}
+
+.linha-fonte {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--borda);
+}
+
+.linha-fonte:last-child { border-bottom: none; }
+
+.linha-fonte .ponto-legenda { flex-shrink: 0; }
+
+.linha-fonte-nome {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--texto);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.linha-fonte-total {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .aba, .filtros input, .filtros select, .cartao-vaga, .cartao-noticia, .seletor-estado {
         transition: none;
