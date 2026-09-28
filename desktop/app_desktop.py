@@ -19,17 +19,31 @@ acordar. Em vez de mostrar uma janela em branco (ou um erro de "página
 não encontrada") nesse tempo, esta janela abre já com um ecrã de espera
 com o logótipo, e só troca para o painel quando o site responder.
 
+Enquanto a janela está aberta, uma verificação em segundo plano (a cada
+15 minutos) compara o número total de vagas com o que viu da última vez
+e, se houver vagas novas, mostra uma notificação nativa do Windows —
+mesmo que estejas a trabalhar noutra janela. Essa contagem fica guardada
+num pequeno ficheiro local (na pasta de dados da aplicação), para a
+comparação continuar a fazer sentido mesmo depois de fechares e voltares
+a abrir o Monitor.
+
 Para reconstruir o .exe depois de alterar este ficheiro, ver README.md
 nesta pasta.
 """
+import json
+import os
+import threading
 import time
 import urllib.request
+from pathlib import Path
 
 import webview
 
 URL_PAINEL = "https://monitor-vagas-noticias.onrender.com/dashboard?modo=app"
+URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
 TEMPO_LIMITE_SEGUNDOS = 75
+INTERVALO_VERIFICACAO_SEGUNDOS = 15 * 60
 
 PAGINA_ESPERA = """
 <!DOCTYPE html>
@@ -102,6 +116,71 @@ def _esperar_e_abrir_painel(janela):
     janela.load_html(PAGINA_FALHA)
 
 
+def _pasta_dados_locais() -> Path:
+    """Pasta de dados da aplicação (AppData no Windows), para guardar o
+    pequeno ficheiro de estado local — nunca dados sensíveis, só um número."""
+    base = os.environ.get("APPDATA") or str(Path.home())
+    pasta = Path(base) / "MonitorVagasNoticias"
+    pasta.mkdir(parents=True, exist_ok=True)
+    return pasta
+
+
+FICHEIRO_ESTADO_LOCAL = _pasta_dados_locais() / "estado_local.json"
+
+
+def _ler_total_vagas_conhecido():
+    try:
+        dados = json.loads(FICHEIRO_ESTADO_LOCAL.read_text(encoding="utf-8"))
+        return dados.get("total_vagas")
+    except Exception:
+        return None
+
+
+def _gravar_total_vagas_conhecido(total: int) -> None:
+    try:
+        FICHEIRO_ESTADO_LOCAL.write_text(json.dumps({"total_vagas": total}), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _notificar_vagas_novas(novas: int, janela) -> None:
+    texto = "1 vaga nova encontrada." if novas == 1 else f"{novas} vagas novas encontradas."
+
+    def ao_clicar(_args=None):
+        try:
+            janela.restore()
+        except Exception:
+            pass
+
+    try:
+        from win11toast import notify
+        notify(TITULO_JANELA, texto, on_click=ao_clicar)
+    except Exception:
+        # Notificações nativas são um extra, não algo essencial — se o
+        # Windows ou o pacote win11toast falharem por qualquer razão, o
+        # resto da aplicação continua a funcionar normalmente.
+        pass
+
+
+def _verificar_vagas_novas_periodicamente(janela) -> None:
+    # Dá tempo à janela principal de acabar de abrir antes da primeira
+    # verificação, para não competir com o arranque com o Render a acordar.
+    time.sleep(30)
+    while True:
+        try:
+            with urllib.request.urlopen(URL_RESUMO, timeout=10) as resposta:
+                dados = json.loads(resposta.read().decode("utf-8"))
+            total_atual = dados.get("total_vagas")
+            if isinstance(total_atual, int):
+                total_anterior = _ler_total_vagas_conhecido()
+                if total_anterior is not None and total_atual > total_anterior:
+                    _notificar_vagas_novas(total_atual - total_anterior, janela)
+                _gravar_total_vagas_conhecido(total_atual)
+        except Exception:
+            pass
+        time.sleep(INTERVALO_VERIFICACAO_SEGUNDOS)
+
+
 def principal():
     janela = webview.create_window(
         title=TITULO_JANELA,
@@ -111,6 +190,9 @@ def principal():
         min_size=(960, 640),
         text_select=True,
     )
+    threading.Thread(
+        target=_verificar_vagas_novas_periodicamente, args=(janela,), daemon=True
+    ).start()
     webview.start(_esperar_e_abrir_painel, janela)
 
 

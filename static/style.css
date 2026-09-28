@@ -141,6 +141,9 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 }
 
 .aba {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     appearance: none;
     background: none;
     border: none;
@@ -160,6 +163,23 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
     color: var(--azul-700);
     border-bottom-color: var(--azul-700);
 }
+
+.aba-contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--acento);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.aba-contador[hidden] { display: none; }
 
 .filtros {
     display: flex;
@@ -380,12 +400,106 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 }
 .cartao-vaga.a-celebrar { animation: cartaoBrilho 1s ease-out; }
 
+/* Estatísticas */
+
+.grelha-estatisticas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding-bottom: 60px;
+}
+
+.cartao-estatistica {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    padding: 18px 20px;
+    box-shadow: var(--sombra);
+}
+
+.cartao-estatistica-larga { grid-column: 1 / -1; }
+
+.estatistica-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.estatistica-titulo {
+    margin: 0 0 10px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--texto);
+}
+
+.cartao-estatistica-larga .estatistica-titulo { margin-bottom: 0; }
+
+.estatistica-legenda {
+    display: flex;
+    gap: 14px;
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+}
+
+.legenda-item { display: flex; align-items: center; gap: 5px; }
+
+.ponto-legenda {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.ponto-legenda-vagas { background: var(--azul-700); }
+.ponto-legenda-noticias { background: var(--acento); }
+
+.cartao-estatistica canvas {
+    width: 100%;
+    display: block;
+    min-height: 120px;
+}
+
+.taxa-resposta-numero {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--sucesso);
+    line-height: 1;
+}
+
+.taxa-resposta-barra {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--borda);
+    overflow: hidden;
+    margin: 12px 0 8px;
+}
+
+.taxa-resposta-preenchimento {
+    height: 100%;
+    background: var(--sucesso);
+    border-radius: 999px;
+    transition: width .6s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.taxa-resposta-legenda {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .aba, .filtros input, .filtros select, .cartao-vaga, .cartao-noticia, .seletor-estado {
         transition: none;
     }
     .etiqueta-estado.a-celebrar, .cartao-vaga.a-celebrar {
         animation: none;
+    }
+    .taxa-resposta-preenchimento {
+        transition: none;
     }
 }
 

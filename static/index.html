@@ -65,8 +65,12 @@
         </section>
 
         <nav class="abas" role="tablist" aria-label="Secções">
-            <button class="aba aba-ativa" data-aba="vagas" role="tab" aria-selected="true">Vagas</button>
+            <button class="aba aba-ativa" data-aba="vagas" role="tab" aria-selected="true">
+                Vagas
+                <span class="aba-contador" id="contadorVagasNovas" hidden>0</span>
+            </button>
             <button class="aba" data-aba="noticias" role="tab" aria-selected="false">Notícias</button>
+            <button class="aba" data-aba="estatisticas" role="tab" aria-selected="false">Estatísticas</button>
         </nav>
 
         <section class="painel" data-painel="vagas">
@@ -115,6 +119,39 @@
             </div>
             <div class="lista" id="listaNoticias">
                 <p class="estado-vazio">A carregar notícias…</p>
+            </div>
+        </section>
+
+        <section class="painel" data-painel="estatisticas" hidden>
+            <div class="grelha-estatisticas">
+                <div class="cartao-estatistica cartao-estatistica-larga">
+                    <div class="estatistica-cabecalho">
+                        <h2 class="estatistica-titulo">Evolução nos últimos 30 dias</h2>
+                        <div class="estatistica-legenda">
+                            <span class="legenda-item"><i class="ponto-legenda ponto-legenda-vagas"></i>Vagas</span>
+                            <span class="legenda-item"><i class="ponto-legenda ponto-legenda-noticias"></i>Notícias</span>
+                        </div>
+                    </div>
+                    <canvas id="graficoEvolucao"></canvas>
+                </div>
+                <div class="cartao-estatistica">
+                    <h2 class="estatistica-titulo">Taxa de resposta às candidaturas</h2>
+                    <div id="taxaResposta">
+                        <p class="estado-vazio">A carregar…</p>
+                    </div>
+                </div>
+                <div class="cartao-estatistica">
+                    <h2 class="estatistica-titulo">Por termo de pesquisa</h2>
+                    <canvas id="graficoTermos"></canvas>
+                </div>
+                <div class="cartao-estatistica">
+                    <h2 class="estatistica-titulo">Por localização</h2>
+                    <canvas id="graficoLocalizacoes"></canvas>
+                </div>
+                <div class="cartao-estatistica">
+                    <h2 class="estatistica-titulo">Por fonte</h2>
+                    <canvas id="graficoFontes"></canvas>
+                </div>
             </div>
         </section>
     </main>

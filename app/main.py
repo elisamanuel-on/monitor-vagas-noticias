@@ -166,6 +166,75 @@ def resumo():
     }
 
 
+def _evolucao_por_dia(dias: int = 30) -> list[dict]:
+    """Quantas vagas e notícias novas (por data de publicação) em cada um dos
+    últimos `dias` dias, para desenhar um gráfico de evolução no tempo."""
+    agora = datetime.now(timezone.utc)
+    inicio = agora - timedelta(days=dias)
+
+    pipeline = [
+        {"$match": {"publicado_em": {"$gte": inicio}}},
+        {
+            "$group": {
+                "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$publicado_em"}},
+                "total": {"$sum": 1},
+            }
+        },
+    ]
+    contagem_vagas = {d["_id"]: d["total"] for d in get_vagas_collection().aggregate(pipeline)}
+    contagem_noticias = {d["_id"]: d["total"] for d in get_noticias_collection().aggregate(pipeline)}
+
+    serie = []
+    for i in range(dias, -1, -1):
+        dia = (agora - timedelta(days=i)).strftime("%Y-%m-%d")
+        serie.append({
+            "data": dia,
+            "vagas": contagem_vagas.get(dia, 0),
+            "noticias": contagem_noticias.get(dia, 0),
+        })
+    return serie
+
+
+def _distribuicao(colecao, campo: str, limite: int, e_lista: bool = False) -> list[dict]:
+    """Top `limite` valores mais frequentes de `campo` numa coleção, para um
+    gráfico de barras (termos de pesquisa, localizações ou fontes)."""
+    pipeline = []
+    if e_lista:
+        pipeline.append({"$unwind": f"${campo}"})
+    pipeline += [
+        {"$match": {campo: {"$nin": [None, ""]}}},
+        {"$group": {"_id": f"${campo}", "total": {"$sum": 1}}},
+        {"$sort": {"total": -1}},
+        {"$limit": limite},
+    ]
+    return [{"chave": d["_id"], "total": d["total"]} for d in colecao.aggregate(pipeline)]
+
+
+@app.get("/api/estatisticas")
+def estatisticas():
+    """Números mais ricos para a aba 'Estatísticas' do painel: evolução no
+    tempo, distribuição por termo/localização/fonte e taxa de resposta."""
+    vagas = get_vagas_collection()
+
+    candidatadas = vagas.count_documents(
+        {"estado": {"$in": ["candidatei_me", "resposta_recebida"]}}
+    )
+    com_resposta = vagas.count_documents({"estado": "resposta_recebida"})
+    percentagem = round((com_resposta / candidatadas) * 100, 1) if candidatadas else 0.0
+
+    return {
+        "evolucao": _evolucao_por_dia(30),
+        "por_termo": _distribuicao(vagas, "termo_origem", limite=12),
+        "por_localizacao": _distribuicao(vagas, "localizacoes", limite=10, e_lista=True),
+        "por_fonte": _distribuicao(vagas, "fonte", limite=10),
+        "taxa_resposta": {
+            "candidatadas": candidatadas,
+            "com_resposta": com_resposta,
+            "percentagem": percentagem,
+        },
+    }
+
+
 # Frontend estático (tem de vir depois das rotas /api/... para não as tapar)
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 

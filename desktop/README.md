@@ -17,8 +17,14 @@ um `.exe` do Windows só é possível a partir de um Windows a sério.
 ```
 cd "C:\Users\elisa\Documents\monitor-vagas-noticias\desktop"
 pip install -r requirements-desktop.txt
-pyinstaller --onefile --windowed --icon=monitor.ico --name "Monitor" app_desktop.py
+pyinstaller --onefile --windowed --icon=monitor.ico --collect-all winsdk --name "Monitor" app_desktop.py
 ```
+
+O `--collect-all winsdk` é novo: é a biblioteca que a notificação nativa do
+Windows usa por baixo (via `win11toast`), e o PyInstaller normalmente não
+consegue detetar sozinho todas as suas peças. Sem esta opção o `.exe` ainda
+abre normalmente, só que as notificações ficam silenciosamente por
+acontecer.
 
 O ficheiro final fica em `desktop\dist\Monitor.exe`. Podes copiá-lo para
 o ambiente de trabalho, fixá-lo na barra de tarefas, o que quiseres —
@@ -35,6 +41,18 @@ Não é o antivírus a dizer que há um vírus, é só o SmartScreen a
 desconfiar de qualquer `.exe` novo sem assinatura. Para abrir: clica em
 "Mais informações" e depois em "Executar mesmo assim". Isto só acontece
 a primeira vez que o Windows vê aquele ficheiro específico.
+
+## Notificações de vagas novas
+
+Enquanto o Monitor está aberto (mesmo minimizado ou por trás de outra
+janela), verifica a cada 15 minutos se há vagas novas e, se houver, mostra
+uma notificação nativa do Windows no canto do ecrã — clicar nela traz o
+Monitor de volta para a frente. Essa verificação guarda um pequeno
+ficheiro local (só um número, o total de vagas já visto) em
+`%APPDATA%\MonitorVagasNoticias\estado_local.json`, para a comparação
+continuar a fazer sentido mesmo depois de fechares e voltares a abrir o
+programa. Não é preciso fazer nada para ativar isto — funciona sozinho a
+partir do momento em que abres o `.exe`.
 
 ## Se a janela não abrir
 
