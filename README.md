@@ -97,7 +97,7 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 ## Novidades na v1.6.0
 
-- **Limpeza automática de dados antigos**: o robô diário apaga agora notícias e vagas com mais de 90 dias (usando `publicado_em`). Nunca apaga vagas em "candidatei_me" ou "resposta_recebida" — esse é o teu histórico real de candidaturas, e conta para a taxa de resposta nas Estatísticas. Ver `limpar_dados_antigos()` em `app/database.py`.
+- **Limpeza automática de dados antigos**: o robô diário apaga agora notícias e vagas com mais de 90 dias (usando `publicado_em`). Nunca apaga vagas em "candidatei_me" ou "resposta_recebida" - esse é o teu histórico real de candidaturas, e conta para a taxa de resposta nas Estatísticas. Ver `limpar_dados_antigos()` em `app/database.py`.
 
 ## Novidades na v1.5.0
 
