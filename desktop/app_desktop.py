@@ -41,7 +41,9 @@ import webview
 
 URL_PAINEL = "https://monitor-vagas-noticias.onrender.com/dashboard?modo=app"
 URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
+VERSAO = "1.5.0"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
+TITULO_JANELA_COM_VERSAO = f"{TITULO_JANELA} — v{VERSAO}"
 TEMPO_LIMITE_SEGUNDOS = 75
 INTERVALO_VERIFICACAO_SEGUNDOS = 15 * 60
 
@@ -67,6 +69,7 @@ PAGINA_ESPERA = """
   @keyframes girar { to { transform: rotate(360deg); } }
   h1 { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
   p { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; }
+  .versao { margin-top: 14px; font-size: 11px; color: rgba(255,255,255,.45); }
 </style>
 </head>
 <body>
@@ -74,10 +77,11 @@ PAGINA_ESPERA = """
     <div class="anel"></div>
     <h1>A ligar ao Monitor de Vagas & Notícias…</h1>
     <p>Pode demorar um pouco na primeira vez do dia.</p>
+    <p class="versao">v{VERSAO}</p>
   </div>
 </body>
 </html>
-"""
+""".replace("{VERSAO}", VERSAO)
 
 PAGINA_FALHA = """
 <!DOCTYPE html>
@@ -183,7 +187,7 @@ def _verificar_vagas_novas_periodicamente(janela) -> None:
 
 def principal():
     janela = webview.create_window(
-        title=TITULO_JANELA,
+        title=TITULO_JANELA_COM_VERSAO,
         html=PAGINA_ESPERA,
         width=1280,
         height=860,

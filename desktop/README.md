@@ -1,5 +1,7 @@
 # Monitor de Vagas & Notícias — versão de secretária
 
+**Versão atual:** 1.5.0 (aparece no título da janela e no ecrã de espera ao abrir)
+
 Um `.exe` a sério: abre numa janela própria, sem barra de endereço nem
 separadores de browser. Não corre nada localmente e não guarda nenhuma
 password ou chave de API dentro do ficheiro — é só uma janela nativa
@@ -9,6 +11,10 @@ internet para funcionar, tal como precisavas de internet para abrir o
 site num browser.
 
 ## Construir o .exe (fazer só uma vez, ou sempre que mudares `app_desktop.py`)
+
+Se estiveres a lançar uma versão nova, atualiza primeiro a constante
+`VERSAO` no topo do `app_desktop.py` — é ela que aparece no título da
+janela e no ecrã de espera.
 
 Estes comandos correm no teu terminal normal do Windows (o mesmo onde
 corres o `git`), **não** no terminal isolado desta conversa — construir

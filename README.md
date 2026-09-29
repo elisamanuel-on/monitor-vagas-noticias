@@ -1,5 +1,7 @@
 # Monitor de Vagas & Notícias
 
+**Versão atual:** 1.5.0
+
 Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
 - **Vagas de emprego reais**, via [API oficial da ITJobs](https://www.itjobs.pt/api) - vagas de tecnologia em Portugal, filtradas pelas palavras-chave configuradas em `VAGAS_QUERY`.
@@ -92,6 +94,13 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v1.5.0
+
+- Identidade visual própria ("Azul Editorial") na vitrine pública e no painel de trabalho.
+- Aba de **Estatísticas**: evolução de vagas/notícias nos últimos 30 dias, distribuição por termo de pesquisa/localização/fonte e taxa de resposta às candidaturas.
+- Indicador de vagas novas desde a última visita, na própria aba "Vagas".
+- Versão de secretária (`desktop/`): um `.exe` nativo para Windows, com ecrã de espera enquanto o Render acorda e notificações nativas quando aparecem vagas novas.
 
 ## Notas de design
 
