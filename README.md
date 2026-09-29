@@ -67,7 +67,7 @@ No repositório: **Settings → Secrets and variables → Actions**
 
 ### 5. Variável de ambiente no Render (para o dashboard)
 
-Se fores publicar o dashboard no Render (ver `render.yaml`), define `MONGODB_URI` manualmente no dashboard do Render — tal como no Controlo de Gastos, nunca fica no repositório.
+Se fores publicar o dashboard no Render (ver `render.yaml`), define `MONGODB_URI` manualmente no dashboard do Render - tal como no Controlo de Gastos, nunca fica no repositório.
 
 ## Correr localmente
 
