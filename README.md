@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 1.5.0
+**Versão atual:** 1.6.0
 
 Painel pessoal (sem login) que acompanha, todos os dias e automaticamente:
 
@@ -95,6 +95,10 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
 
+## Novidades na v1.6.0
+
+- **Limpeza automática de dados antigos**: o robô diário apaga agora notícias e vagas com mais de 90 dias (usando `publicado_em`). Nunca apaga vagas em "candidatei_me" ou "resposta_recebida" — esse é o teu histórico real de candidaturas, e conta para a taxa de resposta nas Estatísticas. Ver `limpar_dados_antigos()` em `app/database.py`.
+
 ## Novidades na v1.5.0
 
 - Identidade visual própria ("Azul Editorial") na vitrine pública e no painel de trabalho.
@@ -107,3 +111,4 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 - **Sem autenticação** é uma ferramenta pessoal, não uma app multiutilizador.
 - **Nunca apaga o estado de uma vaga já classificada**: quando o robô encontra outra vez uma vaga que já conheces, atualiza os outros dados (salário, etc.) mas nunca mexe no campo `estado` que tu própria vais mudando no dashboard.
 - **Dados reais desde o primeiro dia**: nenhuma das fontes usa dados de exemplo, a API da ITJobs e o feed RSS são sempre consultados ao vivo.
+- **Retenção de 90 dias**: notícias e vagas não candidatadas/arquivadas com mais de 90 dias são apagadas automaticamente pelo robô diário, para a base de dados não crescer para sempre. Vagas em "candidatei_me" ou "resposta_recebida" nunca são apagadas.

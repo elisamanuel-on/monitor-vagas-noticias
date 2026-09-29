@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias — versão de secretária
 
-**Versão atual:** 1.5.0 (aparece no título da janela e no ecrã de espera ao abrir)
+**Versão atual:** 1.6.0 (aparece no título da janela e no ecrã de espera ao abrir)
 
 Um `.exe` a sério: abre numa janela própria, sem barra de endereço nem
 separadores de browser. Não corre nada localmente e não guarda nenhuma

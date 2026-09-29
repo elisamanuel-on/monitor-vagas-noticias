@@ -27,7 +27,7 @@ app = FastAPI(
         "e notícias reais do setor de tecnologia interativa (RSS), recolhidas "
         "automaticamente todos os dias."
     ),
-    version="1.5.0",
+    version="1.6.0",
 )
 
 

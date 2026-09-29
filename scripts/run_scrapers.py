@@ -10,6 +10,7 @@ import argparse
 import logging
 import sys
 
+from app.database import limpar_dados_antigos
 from app.scrapers.noticias_rss import recolher_noticias
 from app.scrapers.vagas_itjobs import recolher_vagas as recolher_vagas_itjobs
 
@@ -51,6 +52,18 @@ def main() -> int:
         except Exception as exc:  # noqa: BLE001
             logger.exception("Falha na recolha de notícias")
             erros.append(("noticias", exc))
+
+    # Limpeza de dados antigos: corre sempre no fim, mesmo com --so, porque
+    # é manutenção geral da base de dados, não uma recolha. Uma falha aqui
+    # não deve esconder o resultado das recolhas acima, por isso fica no
+    # mesmo mecanismo de erros do resto do robô.
+    try:
+        resultado_limpeza = limpar_dados_antigos()
+        if any(resultado_limpeza.values()):
+            print(f"Limpeza de dados antigos: {resultado_limpeza}")
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Falha na limpeza de dados antigos")
+        erros.append(("limpeza", exc))
 
     if erros:
         for nome, exc in erros:

@@ -7,6 +7,7 @@ fica escrita no código nem no repositório. Localmente define-a num ficheiro
 "secret" / variável de ambiente na própria plataforma.
 """
 import os
+from datetime import datetime, timedelta, timezone
 
 import certifi
 from dotenv import load_dotenv
@@ -14,6 +15,10 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
+
+# Há quantos dias uma vaga/notícia pode ficar sem interesse antes de ser
+# apagada automaticamente — ver limpar_dados_antigos() mais abaixo.
+DIAS_RETENCAO = 90
 
 load_dotenv()
 
@@ -67,3 +72,30 @@ def get_noticias_collection() -> Collection:
     colecao = get_db()["noticias"]
     colecao.create_index("link", unique=True)
     return colecao
+
+
+def limpar_dados_antigos() -> dict:
+    """Apaga notícias e vagas com mais de DIAS_RETENCAO dias, para a base de
+    dados não crescer para sempre.
+
+    Nunca apaga vagas em 'candidatei_me' ou 'resposta_recebida' — são o teu
+    histórico real de candidaturas, e contam para a taxa de resposta na aba
+    Estatísticas do painel. Só limpa vagas 'por_candidatar' (nunca chegaste
+    a mexer) e 'arquivada' (já dispensadas), além das notícias.
+
+    Usa sempre `publicado_em` (a data original da vaga/notícia, não a data
+    em que o robô a recolheu) como referência de idade; `$type: "date"`
+    evita apagar por engano um registo cuja data não foi possível calcular.
+    """
+    corte = datetime.now(timezone.utc) - timedelta(days=DIAS_RETENCAO)
+    filtro_antigo = {"publicado_em": {"$lt": corte, "$type": "date"}}
+
+    noticias = get_noticias_collection()
+    apagadas_noticias = noticias.delete_many(filtro_antigo).deleted_count
+
+    vagas = get_vagas_collection()
+    apagadas_vagas = vagas.delete_many(
+        {**filtro_antigo, "estado": {"$in": ["por_candidatar", "arquivada"]}}
+    ).deleted_count
+
+    return {"noticias_apagadas": apagadas_noticias, "vagas_apagadas": apagadas_vagas}
