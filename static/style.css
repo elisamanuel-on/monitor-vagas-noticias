@@ -123,6 +123,36 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 
 .conta-sair:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
 
+.conta-apagar {
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--aviso);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.conta-apagar:hover { border-bottom-color: var(--aviso); }
+
+.pagina-texto {
+    padding-bottom: 60px;
+}
+
+.pagina-texto h2 {
+    font-size: 1.05rem;
+    margin: 32px 0 8px;
+}
+
+.pagina-texto p {
+    color: var(--texto-suave);
+    max-width: 640px;
+}
+
+.pagina-texto a { color: var(--azul-700); }
+
 .intro {
     padding: 40px 0 8px;
 }

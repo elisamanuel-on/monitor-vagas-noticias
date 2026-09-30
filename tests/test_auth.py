@@ -104,3 +104,78 @@ def test_obter_utilizador_opcional_com_id_inexistente(colecao_utilizadores_falsa
     assert auth.obter_utilizador_opcional(
         PedidoFalso({"utilizador_id": str(ObjectId())})
     ) is None
+
+
+# --- Testes de integração das rotas (TestClient), com o Mongo simulado ---
+
+os.environ.setdefault("GOOGLE_CLIENT_ID", "id-de-teste")
+os.environ.setdefault("GOOGLE_CLIENT_SECRET", "segredo-de-teste")
+
+
+@pytest.fixture
+def cliente_com_mongo_falso(monkeypatch):
+    """TestClient da app inteira, com o MongoClient usado por app/database.py
+    substituído por mongomock — para testar as rotas (proteção do /dashboard,
+    apagar conta, etc.) sem precisar de um MongoDB real nem de rede. Como
+    get_client() guarda o cliente numa variável global (_client), o mesmo
+    cliente simulado é reutilizado por todas as coleções durante o teste."""
+    import app.database as database_module
+
+    monkeypatch.setattr(database_module, "MongoClient", mongomock.MongoClient)
+    monkeypatch.setattr(database_module, "_client", None)
+
+    from fastapi.testclient import TestClient
+    from app import main as main_module
+
+    with TestClient(main_module.app) as cliente:
+        yield cliente, main_module
+
+    main_module.app.dependency_overrides.clear()
+
+
+def test_dashboard_sem_login_redireciona(cliente_com_mongo_falso):
+    cliente, _ = cliente_com_mongo_falso
+    resposta = cliente.get("/dashboard", follow_redirects=False)
+    assert resposta.status_code == 307
+    assert resposta.headers["location"].startswith("/auth/login")
+
+
+def test_dashboard_modo_app_preserva_o_parametro_no_login(cliente_com_mongo_falso):
+    cliente, _ = cliente_com_mongo_falso
+    resposta = cliente.get("/dashboard?modo=app", follow_redirects=False)
+    assert "modo%3Dapp" in resposta.headers["location"]
+
+
+def test_dashboard_com_login_devolve_a_pagina(cliente_com_mongo_falso):
+    cliente, main_module = cliente_com_mongo_falso
+    main_module.app.dependency_overrides[auth.obter_utilizador_opcional] = lambda: {
+        "id": "abc", "nome": "Elisama", "email": "e@example.com", "foto": None
+    }
+    assert cliente.get("/dashboard").status_code == 200
+
+
+def test_vitrine_e_privacidade_sao_publicas(cliente_com_mongo_falso):
+    cliente, _ = cliente_com_mongo_falso
+    assert cliente.get("/").status_code == 200
+    assert cliente.get("/privacidade").status_code == 200
+
+
+def test_apagar_conta_sem_login_devolve_401(cliente_com_mongo_falso):
+    cliente, _ = cliente_com_mongo_falso
+    assert cliente.delete("/api/utilizador-atual").status_code == 401
+
+
+def test_apagar_conta_remove_o_registo(cliente_com_mongo_falso):
+    cliente, main_module = cliente_com_mongo_falso
+    # Cria o utilizador através do mesmo Mongo simulado que a app usa (a
+    # fixture já garante que é o mesmo cliente, por causa do cache em _client).
+    utilizador = auth.obter_ou_criar_utilizador(DADOS_GOOGLE_EXEMPLO)
+
+    main_module.app.dependency_overrides[auth.obter_utilizador_opcional] = lambda: utilizador
+    resposta = cliente.delete("/api/utilizador-atual")
+
+    assert resposta.status_code == 200
+    assert resposta.json() == {"apagado": True}
+
+    from app.database import get_utilizadores_collection
+    assert get_utilizadores_collection().count_documents({}) == 0

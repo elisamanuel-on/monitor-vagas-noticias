@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 1.7.0
+**Versão atual:** 1.7.1
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -109,6 +109,11 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
 
+## Novidades na v1.7.1
+
+- **Página de privacidade** (`/privacidade`): explica em português simples que dados pessoais ficam guardados ao entrar com o Google (nome, email, foto), porquê, e como pedir para serem apagados. Link visível no rodapé da vitrine e do painel, e uma nota junto ao botão de entrar na vitrine.
+- **Apagar a própria conta**: botão "Apagar a minha conta" no cabeçalho do painel (ao lado de "Sair"), que remove por completo o registo do utilizador da base de dados — direito ao apagamento, cumprido em autosserviço.
+
 ## Novidades na v1.7.0
 
 - **Login com conta Google**: o dashboard (`/dashboard`) passou a exigir login — qualquer pessoa com o link pode entrar com a sua própria conta Google, sem passwords geridas por nós (ver `app/auth.py` e a secção "Login com conta Google" acima). O cabeçalho do painel mostra o nome/foto de quem está autenticado e um botão para sair.
@@ -133,3 +138,4 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 - **Nunca apaga o estado de uma vaga já classificada**: quando o robô encontra outra vez uma vaga que já conheces, atualiza os outros dados (salário, etc.) mas nunca mexe no campo `estado` que tu própria vais mudando no dashboard.
 - **Dados reais desde o primeiro dia**: nenhuma das fontes usa dados de exemplo, a API da ITJobs e o feed RSS são sempre consultados ao vivo.
 - **Retenção de 90 dias**: notícias e vagas não candidatadas/arquivadas com mais de 90 dias são apagadas automaticamente pelo robô diário, para a base de dados não crescer para sempre. Vagas em "candidatei_me" ou "resposta_recebida" nunca são apagadas.
+- **Direito ao apagamento (ver `/privacidade`)**: quem entrou com a conta Google pode apagar a própria conta a qualquer momento, no próprio painel — a conta não fica guardada "para sempre" sem controlo da pessoa.

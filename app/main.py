@@ -23,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.auth import oauth, obter_ou_criar_utilizador, obter_utilizador_opcional
-from app.database import get_noticias_collection, get_vagas_collection
+from app.database import get_noticias_collection, get_utilizadores_collection, get_vagas_collection
 from app.models import AtualizarEstadoVaga
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,7 +35,7 @@ app = FastAPI(
         "e notícias reais do setor de tecnologia interativa (RSS), recolhidas "
         "automaticamente todos os dias. Login com conta Google."
     ),
-    version="1.7.0",
+    version="1.7.1",
 )
 
 # A sessão de login fica num cookie assinado com SECRET_KEY — nunca com
@@ -270,6 +270,18 @@ def utilizador_atual(utilizador: Optional[dict] = Depends(obter_utilizador_opcio
     }
 
 
+@app.delete("/api/utilizador-atual")
+def apagar_conta(request: Request, utilizador: Optional[dict] = Depends(obter_utilizador_opcional)):
+    """Direito ao apagamento: remove por completo o registo do utilizador
+    (nome, email, foto, google_id) da coleção `utilizadores` e termina a
+    sessão. Não apaga vagas/notícias — essas nunca tiveram dados pessoais."""
+    if not utilizador:
+        raise HTTPException(status_code=401, detail="Não autenticado")
+    get_utilizadores_collection().delete_one({"_id": ObjectId(utilizador["id"])})
+    request.session.clear()
+    return {"apagado": True}
+
+
 @app.get("/auth/login")
 async def auth_login(request: Request, destino: str = "/dashboard"):
     """Início do login: guarda para onde voltar depois (ex: /dashboard?modo=app,
@@ -325,3 +337,9 @@ def painel(request: Request, utilizador: Optional[dict] = Depends(obter_utilizad
         destino = "/dashboard" + (f"?modo={modo}" if modo else "")
         return RedirectResponse(url=f"/auth/login?destino={quote(destino)}")
     return FileResponse(str(BASE_DIR / "static" / "index.html"), headers=_SEM_CACHE)
+
+
+@app.get("/privacidade")
+def privacidade():
+    """Página pública: que dados pessoais guardamos ao entrar com o Google e como pedir para os apagar."""
+    return FileResponse(str(BASE_DIR / "static" / "privacidade.html"), headers=_SEM_CACHE)
