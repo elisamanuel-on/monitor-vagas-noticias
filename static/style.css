@@ -92,50 +92,59 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .conta-utilizador {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-left: 16px;
-    border-left: 1px solid var(--borda);
+    gap: 9px;
+    padding: 5px 12px 5px 6px;
+    background: var(--fundo);
+    border: 1px solid var(--borda);
+    border-radius: 999px;
 }
 
 .conta-foto {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .conta-nome {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--texto);
     font-weight: 600;
-    max-width: 140px;
+    max-width: 130px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.conta-sair {
-    font-size: 0.8rem;
-    color: var(--texto-suave);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
+.conta-separador {
+    width: 1px;
+    height: 14px;
+    background: var(--borda);
+    flex-shrink: 0;
 }
 
-.conta-sair:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
+.conta-sair {
+    font-size: 0.78rem;
+    color: var(--texto-suave);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.conta-sair:hover { color: var(--azul-700); }
 
 .conta-apagar {
     font: inherit;
-    font-size: 0.8rem;
-    color: var(--aviso);
+    font-size: 0.78rem;
+    color: var(--texto-fraco);
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
+    white-space: nowrap;
 }
 
-.conta-apagar:hover { border-bottom-color: var(--aviso); }
+.conta-apagar:hover { color: var(--aviso); }
 
 .pagina-texto {
     padding-bottom: 60px;
