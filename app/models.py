@@ -33,3 +33,13 @@ class Noticia(BaseModel):
     link: str
     publicado_em: Optional[datetime] = None
     criado_em: datetime
+
+
+class Utilizador(BaseModel):
+    id: str
+    google_id: str
+    nome: str
+    email: str
+    foto: Optional[str] = None
+    criado_em: datetime
+    ultimo_login_em: datetime

@@ -74,6 +74,14 @@ def get_noticias_collection() -> Collection:
     return colecao
 
 
+def get_utilizadores_collection() -> Collection:
+    colecao = get_db()["utilizadores"]
+    # google_id é o "sub" devolvido pelo Google — identifica sempre a mesma
+    # conta, mesmo que o nome, o email associado ou a foto mudem.
+    colecao.create_index("google_id", unique=True)
+    return colecao
+
+
 def limpar_dados_antigos() -> dict:
     """Apaga notícias e vagas com mais de DIAS_RETENCAO dias, para a base de
     dados não crescer para sempre.

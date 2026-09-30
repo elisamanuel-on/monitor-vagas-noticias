@@ -82,6 +82,47 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 
 .link-portfolio:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
 
+.topo-direita {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.conta-utilizador {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 16px;
+    border-left: 1px solid var(--borda);
+}
+
+.conta-foto {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.conta-nome {
+    font-size: 0.85rem;
+    color: var(--texto);
+    font-weight: 600;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conta-sair {
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.conta-sair:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
+
 .intro {
     padding: 40px 0 8px;
 }

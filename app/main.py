@@ -1,20 +1,28 @@
 """
-Monitor de Vagas & Notícias — dashboard pessoal, sem autenticação.
+Monitor de Vagas & Notícias — dashboard com login por conta Google.
 
 API + frontend estático servidos pelo mesmo processo FastAPI, tal como no
-Controlo de Gastos — mas aqui sem login, porque é uma ferramenta só para a
-Elisama consultar, não uma app multiutilizador.
+Controlo de Gastos. Desde a v1.7.0 que qualquer pessoa com o link pode
+entrar com a própria conta Google — ver app/auth.py. Por agora (fase 1),
+o login identifica quem está a ver o painel, mas as vagas e notícias em
+si continuam partilhadas por todos; a separação de dados por utilizador
+(cada um com as suas próprias candidaturas) é a fase seguinte.
 """
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote
 
+from authlib.integrations.starlette_client import OAuthError
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
+from app.auth import oauth, obter_ou_criar_utilizador, obter_utilizador_opcional
 from app.database import get_noticias_collection, get_vagas_collection
 from app.models import AtualizarEstadoVaga
 
@@ -25,9 +33,20 @@ app = FastAPI(
     description=(
         "Painel pessoal que acompanha vagas de emprego reais (API da ITJobs) "
         "e notícias reais do setor de tecnologia interativa (RSS), recolhidas "
-        "automaticamente todos os dias."
+        "automaticamente todos os dias. Login com conta Google."
     ),
-    version="1.6.0",
+    version="1.7.0",
+)
+
+# A sessão de login fica num cookie assinado com SECRET_KEY — nunca com
+# dados sensíveis dentro, só o id do utilizador na coleção `utilizadores`.
+# https_only=False localmente (http://localhost), True em produção (o
+# Render define sempre a variável de ambiente RENDER="true" sozinho).
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.environ.get("SECRET_KEY", "chave-de-desenvolvimento-local-insegura"),
+    same_site="lax",
+    https_only=os.environ.get("RENDER") is not None,
 )
 
 
@@ -238,6 +257,53 @@ def estatisticas():
     }
 
 
+@app.get("/api/utilizador-atual")
+def utilizador_atual(utilizador: Optional[dict] = Depends(obter_utilizador_opcional)):
+    """Quem está autenticado nesta sessão, para o frontend mostrar o nome/
+    foto e o botão de sair. 401 se ninguém tiver feito login."""
+    if not utilizador:
+        raise HTTPException(status_code=401, detail="Não autenticado")
+    return {
+        "nome": utilizador["nome"],
+        "email": utilizador["email"],
+        "foto": utilizador.get("foto"),
+    }
+
+
+@app.get("/auth/login")
+async def auth_login(request: Request, destino: str = "/dashboard"):
+    """Início do login: guarda para onde voltar depois (ex: /dashboard?modo=app,
+    para o executável de secretária) e envia para o ecrã de consentimento do Google."""
+    request.session["destino_pos_login"] = destino
+    redirect_uri = str(request.url_for("auth_callback"))
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
+@app.get("/auth/callback", name="auth_callback")
+async def auth_callback(request: Request):
+    """Para onde o Google reenvia depois da pessoa autorizar (ou recusar)."""
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError:
+        # Login recusado ou falhado — volta à vitrine em vez de mostrar um erro técnico.
+        return RedirectResponse(url="/")
+
+    dados_google = token.get("userinfo")
+    if not dados_google:
+        return RedirectResponse(url="/")
+
+    utilizador = obter_ou_criar_utilizador(dados_google)
+    request.session["utilizador_id"] = utilizador["id"]
+    destino = request.session.pop("destino_pos_login", "/dashboard")
+    return RedirectResponse(url=destino)
+
+
+@app.get("/auth/logout")
+def auth_logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/")
+
+
 # Frontend estático (tem de vir depois das rotas /api/... para não as tapar)
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
@@ -252,6 +318,10 @@ def raiz():
 
 
 @app.get("/dashboard")
-def painel():
-    """Painel de trabalho completo, com filtros e gestão de candidaturas."""
+def painel(request: Request, utilizador: Optional[dict] = Depends(obter_utilizador_opcional)):
+    """Painel de trabalho completo — exige login com conta Google."""
+    if not utilizador:
+        modo = request.query_params.get("modo")
+        destino = "/dashboard" + (f"?modo={modo}" if modo else "")
+        return RedirectResponse(url=f"/auth/login?destino={quote(destino)}")
     return FileResponse(str(BASE_DIR / "static" / "index.html"), headers=_SEM_CACHE)

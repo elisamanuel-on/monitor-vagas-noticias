@@ -12,3 +12,9 @@ services:
         sync: false  # define manualmente no dashboard do Render (connection string do Atlas) — não fica no repositório
       - key: MONGODB_DB
         value: monitor_vagas_noticias
+      - key: GOOGLE_CLIENT_ID
+        sync: false  # define manualmente no dashboard do Render (Google Cloud Console) — não fica no repositório
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false  # define manualmente no dashboard do Render (Google Cloud Console) — não fica no repositório
+      - key: SECRET_KEY
+        sync: false  # define manualmente no dashboard do Render (string aleatória própria) — não fica no repositório

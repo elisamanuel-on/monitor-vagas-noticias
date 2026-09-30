@@ -41,7 +41,7 @@ import webview
 
 URL_PAINEL = "https://monitor-vagas-noticias.onrender.com/dashboard?modo=app"
 URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
-VERSAO = "1.6.0"
+VERSAO = "1.7.0"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
 TITULO_JANELA_COM_VERSAO = f"{TITULO_JANELA} — v{VERSAO}"
 TEMPO_LIMITE_SEGUNDOS = 75
