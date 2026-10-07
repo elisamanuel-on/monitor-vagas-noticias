@@ -44,7 +44,7 @@ URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
 URL_VERSAO = "https://monitor-vagas-noticias.onrender.com/api/versao"
 # Valor de reserva: ao abrir, o .exe pergunta ao site qual é a versão atual
 # (ver app/versao.py) e escreve essa no título — assim nunca fica desatualizada.
-VERSAO = "2.0.2"
+VERSAO = "2.0.3"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
 TITULO_JANELA_COM_VERSAO = f"{TITULO_JANELA} — v{VERSAO}"
 TEMPO_LIMITE_SEGUNDOS = 75
