@@ -326,125 +326,91 @@ p.intro-secao { color: var(--texto-suave); font-size: 15px; line-height: 1.6; ma
 }
 .rodape-links a { font-weight: 600; font-size: 14px; }
 
-/* ---------- Ecrã de entrada da aplicação (executável): só aparece em ?modo=app ---------- */
+/* ---------- Ecrã de entrada da aplicação (executável): ecrã dividido, só aparece em ?modo=app ---------- */
 .ecra-app { display: none; }
 html.modo-app .so-site { display: none !important; }
 html.modo-app body { background: var(--fundo); }
 html.modo-app .ecra-app {
-    display: grid;
-    grid-template-columns: 72px minmax(0, 1fr);
-    min-height: 100vh;
-}
-.app-trilho {
-    background: var(--azul-900);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 0;
+    min-height: 100vh;
 }
-.app-marca { margin-bottom: 10px; }
-.app-marca img { width: 34px; height: 34px; display: block; background: #fff; border-radius: 9px; padding: 4px; }
-.app-item {
-    width: 54px;
-    padding: 9px 0;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 0.66rem;
-    font-weight: 600;
-    color: #9db4d6;
-}
-.app-item-ativo { background: rgba(255,255,255,.16); color: #fff; }
-.app-item-bloqueado { opacity: .45; }
-.app-versao { margin-top: auto; font: 500 0.6rem "JetBrains Mono", ui-monospace, monospace; color: #9db4d6; }
-.app-corpo { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
-.app-barra {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    padding: 12px 28px;
-    background: var(--superficie);
-    border-bottom: 1px solid var(--borda);
-    font-size: 0.88rem;
-    color: var(--texto-suave);
-}
-.app-estado { display: inline-flex; align-items: center; gap: 7px; color: var(--sucesso); font-weight: 600; }
-.app-estado i { width: 8px; height: 8px; border-radius: 50%; background: var(--sucesso); display: block; }
-.app-estado-erro { color: var(--aviso); }
-.app-estado-erro i { background: var(--aviso); }
-.app-barra-dir { margin-left: auto; }
-.app-principal {
+.app-dividido {
     flex: 1;
-    padding: 26px 28px;
     display: grid;
-    gap: 18px;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    align-content: start;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
 }
-.app-boasvindas {
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, var(--marca-inicio), var(--marca-fim));
+.app-marca-lado {
+    background: linear-gradient(160deg, #13294b, #2f6db0);
     color: #fff;
-    border-radius: var(--raio);
-    padding: 26px 30px;
+    padding: 44px 48px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 28px;
+    justify-content: center;
 }
-.app-boasvindas h1 { font-size: 1.5rem; margin-bottom: 4px; }
-.app-boasvindas p { margin: 0; color: #d5e2f5; max-width: 52ch; }
-.app-google {
+.app-marca { display: flex; align-items: center; gap: 10px; font: 700 1.25rem "Lexend", "Public Sans", sans-serif; color: #fff; text-decoration: none; }
+.app-marca img { width: 30px; height: 30px; display: block; background: #fff; border-radius: 8px; padding: 3px; }
+.app-ao-vivo {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    background: #fff;
-    color: var(--texto);
-    border-radius: 12px;
-    padding: 13px 22px;
-    font-weight: 700;
-    text-decoration: none;
+    gap: 8px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font: 500 0.72rem "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    width: max-content;
+    max-width: 100%;
 }
-.app-google:hover { box-shadow: 0 0 0 4px rgba(255,255,255,.25); }
-.app-numeros { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.app-ao-vivo i { width: 8px; height: 8px; border-radius: 50%; background: #5eead4; box-shadow: 0 0 0 4px rgba(94,234,212,.25); flex: none; }
+.app-ao-vivo-erro i { background: #f4b97a; box-shadow: 0 0 0 4px rgba(244,185,122,.25); }
+.app-marca-lado h1 { font-size: clamp(1.6rem, 2.6vw, 2.3rem); line-height: 1.2; max-width: 18ch; color: #fff; }
+.app-marca-lado p { margin: 0; color: #d5e2f5; max-width: 46ch; }
+.app-numeros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 440px; }
 .app-numero {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+.app-numero b { display: block; font: 700 1.5rem "JetBrains Mono", ui-monospace, monospace; }
+.app-numero span { font-size: 0.82rem; color: #d5e2f5; }
+.app-entrar-lado { display: flex; align-items: center; justify-content: center; padding: 32px; }
+.app-entrar { width: min(100%, 380px); display: flex; flex-direction: column; gap: 14px; }
+.app-entrar h2 { font-size: 1.5rem; }
+.app-entrar p { margin: 0; color: var(--texto-suave); }
+.app-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     background: var(--superficie);
     border: 1px solid var(--borda);
-    border-radius: var(--raio);
-    padding: 14px 18px;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-weight: 600;
+    color: var(--texto);
+    text-decoration: none;
     box-shadow: var(--sombra);
+    width: 100%;
 }
-.app-numero b { display: block; font-size: 1.7rem; line-height: 1.2; }
-.app-numero span { color: var(--texto-suave); font-size: 0.88rem; }
-.app-bloco {
-    background: var(--superficie);
-    border: 1px solid var(--borda);
-    border-radius: var(--raio);
-    padding: 16px 18px;
-    box-shadow: var(--sombra);
-}
-.app-bloco h2 { font-size: 1rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; }
-.app-bloco h2 small { font: 500 0.75rem "Public Sans", sans-serif; color: var(--texto-fraco); }
-.app-linha { padding: 10px 0; border-top: 1px solid var(--borda); }
-.app-linha:first-child { border-top: 0; }
-.app-linha b { display: block; font-size: 0.93rem; }
-.app-linha span { font-size: 0.82rem; color: var(--texto-suave); }
-.app-linha small { display: block; color: var(--acento); font: 600 0.68rem "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.04em; }
-.app-vazio { color: var(--texto-fraco); font-size: 0.88rem; margin: 6px 0; }
-.app-aviso { grid-column: 1 / -1; font-size: 0.84rem; color: var(--texto-fraco); margin: 0; }
-.app-aviso a { color: var(--azul-700); text-decoration: underline; }
+.app-google:hover { border-color: var(--azul-700); }
+.app-google:focus-visible { outline: 3px solid var(--azul-suave); border-color: var(--azul-700); }
+.app-nota { font-size: 0.82rem; color: var(--texto-fraco) !important; }
+.app-nota a { color: var(--azul-700); text-decoration: underline; }
 .app-rodape {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 16px;
     background: var(--superficie);
     border-top: 1px solid var(--borda);
     padding: 12px 28px;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     color: var(--texto-suave);
 }
 .app-rodape nav { display: flex; gap: 18px; flex-wrap: wrap; }
@@ -452,12 +418,8 @@ html.modo-app .ecra-app {
 .app-rodape a:hover { text-decoration: underline; }
 
 @media (max-width: 820px) {
-    html.modo-app .ecra-app { grid-template-columns: 1fr; }
-    .app-trilho { flex-direction: row; padding: 10px 16px; }
-    .app-item { display: none; }
-    .app-versao { margin: 0 0 0 auto; }
-    .app-principal { grid-template-columns: 1fr; padding: 18px 16px; }
-    .app-numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .app-barra { padding: 10px 16px; }
+    .app-dividido { grid-template-columns: 1fr; }
+    .app-marca-lado { padding: 28px 22px; }
+    .app-entrar-lado { padding: 28px 20px; }
     .app-rodape { padding: 10px 16px; }
 }

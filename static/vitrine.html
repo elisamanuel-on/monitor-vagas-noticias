@@ -7,7 +7,7 @@
 <meta name="description" content="Painel automático que recolhe vagas de emprego reais e notícias do setor de tecnologia interativa todos os dias, sem intervenção manual.">
 <link rel="icon" type="image/svg+xml" href="/static/logo-mark.svg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="/static/vitrine.css?v=4">
+<link rel="stylesheet" href="/static/vitrine.css?v=5">
 <script>
     // No executável de secretária o endereço traz "?modo=app": mostra o ecrã
     // de entrada da aplicação em vez da página de apresentação do site.
@@ -98,29 +98,27 @@
         <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a>
         <a href="/privacidade">Privacidade</a>
     </nav>
-    <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <span class="versao-site">v2.0.0</span></p>
+    <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <span class="versao-site">v2.0.1</span></p>
 </footer>
 
 <div class="ecra-app" id="ecraApp">
-    <aside class="app-trilho" aria-hidden="true">
-        <a class="app-marca" href="/?modo=app" title="Monitor"><img src="/static/logo-mark.svg" alt=""></a>
-        <span class="app-item app-item-ativo">Início</span>
-        <span class="app-item app-item-bloqueado">Vagas</span>
-        <span class="app-item app-item-bloqueado">Notícias</span>
-        <span class="app-versao versao-site">v2.0.0</span>
-    </aside>
-    <div class="app-corpo">
-        <div class="app-barra">
-            <span class="app-estado" id="appEstado"><i></i><span id="appEstadoTexto">A ligar…</span></span>
-            <span>Última recolha: <b id="appAtualizado">—</b></span>
-            <span class="app-barra-dir">Monitor de Vagas &amp; Notícias</span>
-        </div>
-        <main class="app-principal">
-            <section class="app-boasvindas">
-                <div>
-                    <h1>Bem-vinda ao Monitor</h1>
-                    <p>Entra com a tua conta Google para abrir o painel, com os filtros e o acompanhamento das tuas candidaturas.</p>
-                </div>
+    <div class="app-dividido">
+        <section class="app-marca-lado">
+            <a class="app-marca" href="/?modo=app" title="Monitor"><img src="/static/logo-mark.svg" alt="">Monitor</a>
+            <span class="app-ao-vivo" id="appEstado"><i></i><span id="appEstadoTexto">Dados reais · atualizados todos os dias</span></span>
+            <h1>Vagas e notícias do setor, recolhidas sozinhas</h1>
+            <p>Dois robôs em Python correm todos os dias: um vai buscar vagas à ITJobs, outro procura notícias sobre tecnologia interativa.</p>
+            <div class="app-numeros">
+                <div class="app-numero"><b id="appVagas">—</b><span>vagas encontradas</span></div>
+                <div class="app-numero"><b id="appNoticias">—</b><span>notícias recolhidas</span></div>
+                <div class="app-numero"><b>2</b><span>fontes automáticas</span></div>
+                <div class="app-numero"><b id="appAtualizado">—</b><span>última recolha</span></div>
+            </div>
+        </section>
+        <section class="app-entrar-lado">
+            <div class="app-entrar">
+                <h2>Entrar</h2>
+                <p>Entra com a tua conta Google para abrir o painel completo, com filtros e acompanhamento das candidaturas.</p>
                 <a class="app-google" href="/auth/login?destino=%2Fdashboard%3Fmodo%3Dapp">
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                         <path fill="#4285F4" d="M23 12.3c0-.8-.1-1.5-.2-2.2H12v4.3h6.2c-.3 1.4-1.1 2.6-2.3 3.4v2.8h3.7c2.2-2 3.4-5 3.4-8.3z"/>
@@ -130,33 +128,19 @@
                     </svg>
                     Continuar com Google
                 </a>
-            </section>
-            <section class="app-numeros">
-                <div class="app-numero"><b class="mono" id="appVagas">—</b><span>vagas encontradas</span></div>
-                <div class="app-numero"><b class="mono" id="appNoticias">—</b><span>notícias recolhidas</span></div>
-                <div class="app-numero"><b class="mono">2</b><span>fontes automáticas</span></div>
-                <div class="app-numero"><b class="mono">24 h</b><span>ciclo de recolha</span></div>
-            </section>
-            <section class="app-bloco">
-                <h2>Vagas mais recentes <small>amostra ao vivo</small></h2>
-                <div id="appListaVagas"><p class="app-vazio">A carregar…</p></div>
-            </section>
-            <section class="app-bloco">
-                <h2>Notícias recentes <small>amostra ao vivo</small></h2>
-                <div id="appListaNoticias"><p class="app-vazio">A carregar…</p></div>
-            </section>
-            <p class="app-aviso">Guardamos só o nome, o email e a foto da tua conta Google. <a href="/privacidade">Como e porquê</a></p>
-        </main>
-        <footer class="app-rodape">
-            <nav aria-label="Ligações">
-                <a href="https://elisamanuel-on.github.io/portfolio.html" target="_blank" rel="noopener">Portfólio</a>
-                <a href="https://elisamanuel-on.github.io/" target="_blank" rel="noopener">Site</a>
-                <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a>
-                <a href="/privacidade">Privacidade</a>
-            </nav>
-            <span>Elisama Manuel</span>
-        </footer>
+                <p class="app-nota">Guardamos só o nome, o email e a foto. <a href="/privacidade">Como e porquê</a></p>
+            </div>
+        </section>
     </div>
+    <footer class="app-rodape">
+        <nav aria-label="Ligações">
+            <a href="https://elisamanuel-on.github.io/portfolio.html" target="_blank" rel="noopener">Portfólio</a>
+            <a href="https://elisamanuel-on.github.io/" target="_blank" rel="noopener">Site</a>
+            <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a>
+            <a href="/privacidade">Privacidade</a>
+        </nav>
+        <span>Elisama Manuel · <span class="versao-site">v2.0.1</span></span>
+    </footer>
 </div>
 
 <script src="/static/versao.js?v=1" defer></script>
@@ -392,31 +376,9 @@
             animarNumero(document.getElementById("appVagas"), resumo.total_vagas);
             animarNumero(document.getElementById("appNoticias"), resumo.total_noticias);
             document.getElementById("appAtualizado").textContent = formatarHora(resumo.atualizado_em);
-            document.getElementById("appEstadoTexto").textContent = "Robôs a funcionar";
         }).catch(function () {
-            document.getElementById("appEstado").classList.add("app-estado-erro");
+            document.getElementById("appEstado").classList.add("app-ao-vivo-erro");
             document.getElementById("appEstadoTexto").textContent = "Sem ligação ao servidor";
-        });
-        function linha(titulo, detalhe, quando, etiqueta) {
-            return '<div class="app-linha">' +
-                (etiqueta ? '<small>' + escaparHTML(etiqueta) + '</small>' : '') +
-                '<b>' + escaparHTML(titulo) + '</b><span>' + escaparHTML(detalhe) + (quando ? ' · ' + escaparHTML(quando) : '') + '</span></div>';
-        }
-        Promise.all([pedirJSON("/api/vagas?periodo=30d"), pedirJSON("/api/noticias?periodo=30d")]).then(function (dados) {
-            var vagas = dados[0].slice(0, 3), noticias = dados[1].slice(0, 3);
-            document.getElementById("appListaVagas").innerHTML = vagas.length
-                ? vagas.map(function (v) {
-                    return linha(v.titulo || "Vaga sem título",
-                        (v.empresa || "Empresa não indicada") + " · " + ((v.localizacoes || []).join(", ") || "Localização não indicada"),
-                        formatarData(v.publicado_em), "");
-                }).join("")
-                : '<p class="app-vazio">Sem vagas recolhidas nos últimos 30 dias.</p>';
-            document.getElementById("appListaNoticias").innerHTML = noticias.length
-                ? noticias.map(function (n) { return linha(n.titulo || "Notícia sem título", formatarData(n.publicado_em), "", n.fonte || ""); }).join("")
-                : '<p class="app-vazio">Sem notícias recolhidas nos últimos 30 dias.</p>';
-        }).catch(function () {
-            document.getElementById("appListaVagas").innerHTML = '<p class="app-vazio">Não foi possível carregar agora.</p>';
-            document.getElementById("appListaNoticias").innerHTML = '<p class="app-vazio">Não foi possível carregar agora.</p>';
         });
     }
 
