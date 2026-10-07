@@ -59,6 +59,49 @@ async function carregarResumo() {
     }
 }
 
+// ---------- Paginação ("Ver mais") ----------
+
+const ITENS_POR_PAGINA = 10;
+
+// Mostra os itens de 10 em 10: os primeiros 10 logo, e um botão "Ver mais"
+// que acrescenta mais 10 de cada vez, sem recarregar nem perder a posição.
+function mostrarEmPaginas(lista, itens, construirCartao, nomePlural) {
+    let mostrados = 0;
+    const rodape = document.createElement('div');
+    rodape.className = 'ver-mais-caixa';
+
+    function atualizar() {
+        const restantes = itens.length - mostrados;
+        rodape.innerHTML = '';
+        if (itens.length <= ITENS_POR_PAGINA) return;
+
+        const contagem = document.createElement('span');
+        contagem.className = 'ver-mais-contagem';
+        contagem.textContent = `A mostrar ${mostrados} de ${itens.length} ${nomePlural}`;
+        rodape.appendChild(contagem);
+
+        if (restantes > 0) {
+            const botao = document.createElement('button');
+            botao.type = 'button';
+            botao.className = 'ver-mais-botao';
+            botao.textContent = `Ver mais ${Math.min(ITENS_POR_PAGINA, restantes)}`;
+            botao.addEventListener('click', acrescentar);
+            rodape.appendChild(botao);
+        }
+    }
+
+    function acrescentar() {
+        itens.slice(mostrados, mostrados + ITENS_POR_PAGINA).forEach((item) => {
+            lista.insertBefore(construirCartao(item), rodape);
+        });
+        mostrados = Math.min(mostrados + ITENS_POR_PAGINA, itens.length);
+        atualizar();
+    }
+
+    lista.appendChild(rodape);
+    acrescentar();
+}
+
 // ---------- Vagas ----------
 
 function construirCartaoVaga(vaga) {
@@ -170,7 +213,7 @@ async function carregarVagas() {
         if (vagas.length === 0) {
             lista.innerHTML = '<p class="estado-vazio">Nenhuma vaga encontrada com estes filtros.</p>';
         } else {
-            vagas.forEach((vaga) => lista.appendChild(construirCartaoVaga(vaga)));
+            mostrarEmPaginas(lista, vagas, construirCartaoVaga, 'vagas');
         }
         // O contador de "novas" só faz sentido em relação ao conjunto todo,
         // não a uma lista já filtrada.
@@ -235,7 +278,7 @@ async function carregarNoticias() {
             lista.innerHTML = '<p class="estado-vazio">Nenhuma notícia encontrada.</p>';
             return;
         }
-        noticias.forEach((noticia) => lista.appendChild(construirCartaoNoticia(noticia)));
+        mostrarEmPaginas(lista, noticias, construirCartaoNoticia, 'notícias');
     } catch (erro) {
         console.error('Não foi possível carregar as notícias', erro);
         lista.innerHTML = '<p class="estado-vazio">Não foi possível carregar as notícias agora.</p>';
