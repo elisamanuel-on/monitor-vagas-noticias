@@ -82,8 +82,8 @@ function mostrarEmPaginas(lista, itens, construirCartao, nomePlural) {
 
         rodape.innerHTML = '';
         if (totalPaginas > 1) {
-            const anterior = criarBotaoPagina('← Anterior', pagina > 1, () => { pagina -= 1; desenhar(true); });
-            const seguinte = criarBotaoPagina('Seguinte →', pagina < totalPaginas, () => { pagina += 1; desenhar(true); });
+            const anterior = criarBotaoPagina('Anterior', pagina > 1, () => { pagina -= 1; desenhar(true); });
+            const seguinte = criarBotaoPagina('Seguinte', pagina < totalPaginas, () => { pagina += 1; desenhar(true); });
             const info = document.createElement('span');
             info.className = 'paginacao-info';
             info.innerHTML = `<span>Página <strong>${pagina}</strong> de ${totalPaginas}</span>`

@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias — versão de secretária
 
-**Versão atual:** 1.8.0 (aparece no título da janela e no ecrã de espera ao abrir)
+**Versão atual:** 1.8.1 (aparece no título da janela e no ecrã de espera ao abrir)
 
 Desde a v1.7.0 que o `/dashboard` exige login com conta Google — ao abrir, o `.exe` mostra o ecrã de login do Google dentro da própria janela (não é preciso confirmar nada de especial na primeira abertura). Isto ainda não foi testado numa build real do `.exe`; se o login não aparecer corretamente dentro da janela, avisa para investigarmos.
 

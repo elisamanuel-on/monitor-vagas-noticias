@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 1.8.0
+**Versão atual:** 1.8.1
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -108,6 +108,10 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v1.8.1
+
+- **Interface sem setas**: removidas as setas escritas nos botões e links ("Anterior", "Seguinte", "Ver vaga", "Ler notícia", "Ver o código" e "Portfólio de Elisama Manuel"). Ficam só os textos.
 
 ## Novidades na v1.8.0
 
