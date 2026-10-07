@@ -59,47 +59,54 @@ async function carregarResumo() {
     }
 }
 
-// ---------- Paginação ("Ver mais") ----------
+// ---------- Paginação ("Anterior · Página 1 de N · Seguinte") ----------
 
 const ITENS_POR_PAGINA = 10;
 
-// Mostra os itens de 10 em 10: os primeiros 10 logo, e um botão "Ver mais"
-// que acrescenta mais 10 de cada vez, sem recarregar nem perder a posição.
+// Mostra os itens em páginas de 10. Os botões Anterior/Seguinte trocam de
+// página e voltam ao início da lista, para a página nunca ficar comprida.
 function mostrarEmPaginas(lista, itens, construirCartao, nomePlural) {
-    let mostrados = 0;
-    const rodape = document.createElement('div');
-    rodape.className = 'ver-mais-caixa';
+    const totalPaginas = Math.max(1, Math.ceil(itens.length / ITENS_POR_PAGINA));
+    let pagina = 1;
 
-    function atualizar() {
-        const restantes = itens.length - mostrados;
+    const rodape = document.createElement('nav');
+    rodape.className = 'paginacao';
+    rodape.setAttribute('aria-label', `Páginas de ${nomePlural}`);
+
+    function desenhar(irParaTopo) {
+        lista.querySelectorAll(':scope > :not(.paginacao)').forEach((no) => no.remove());
+        const inicio = (pagina - 1) * ITENS_POR_PAGINA;
+        itens.slice(inicio, inicio + ITENS_POR_PAGINA).forEach((item) => {
+            lista.insertBefore(construirCartao(item), rodape);
+        });
+
         rodape.innerHTML = '';
-        if (itens.length <= ITENS_POR_PAGINA) return;
-
-        const contagem = document.createElement('span');
-        contagem.className = 'ver-mais-contagem';
-        contagem.textContent = `A mostrar ${mostrados} de ${itens.length} ${nomePlural}`;
-        rodape.appendChild(contagem);
-
-        if (restantes > 0) {
-            const botao = document.createElement('button');
-            botao.type = 'button';
-            botao.className = 'ver-mais-botao';
-            botao.textContent = `Ver mais ${Math.min(ITENS_POR_PAGINA, restantes)}`;
-            botao.addEventListener('click', acrescentar);
-            rodape.appendChild(botao);
+        if (totalPaginas > 1) {
+            const anterior = criarBotaoPagina('← Anterior', pagina > 1, () => { pagina -= 1; desenhar(true); });
+            const seguinte = criarBotaoPagina('Seguinte →', pagina < totalPaginas, () => { pagina += 1; desenhar(true); });
+            const info = document.createElement('span');
+            info.className = 'paginacao-info';
+            info.innerHTML = `<span>Página <strong>${pagina}</strong> de ${totalPaginas}</span>`
+                + `<small>${inicio + 1}–${Math.min(inicio + ITENS_POR_PAGINA, itens.length)} de ${itens.length} ${nomePlural}</small>`;
+            rodape.append(anterior, info, seguinte);
+        }
+        if (irParaTopo) {
+            lista.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 
-    function acrescentar() {
-        itens.slice(mostrados, mostrados + ITENS_POR_PAGINA).forEach((item) => {
-            lista.insertBefore(construirCartao(item), rodape);
-        });
-        mostrados = Math.min(mostrados + ITENS_POR_PAGINA, itens.length);
-        atualizar();
-    }
-
     lista.appendChild(rodape);
-    acrescentar();
+    desenhar(false);
+}
+
+function criarBotaoPagina(texto, ativo, aoClicar) {
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'paginacao-botao';
+    botao.textContent = texto;
+    botao.disabled = !ativo;
+    if (ativo) botao.addEventListener('click', aoClicar);
+    return botao;
 }
 
 // ---------- Vagas ----------
