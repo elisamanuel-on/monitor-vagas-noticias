@@ -77,3 +77,12 @@ def obter_utilizador_opcional(request: Request) -> Optional[dict]:
     if not doc:
         return None
     return _documento_para_utilizador(doc)
+
+
+def url_inicio(destino: Optional[str]) -> str:
+    """Para onde voltar quando o login falha ou a pessoa sai: o executável de
+    secretária (que usa "modo=app" no endereço) volta ao ecrã de entrada da
+    aplicação; o site normal volta à vitrine."""
+    if destino and "modo=app" in destino:
+        return "/?modo=app"
+    return "/"

@@ -140,10 +140,16 @@ def test_dashboard_sem_login_redireciona(cliente_com_mongo_falso):
     assert resposta.headers["location"].startswith("/auth/login")
 
 
-def test_dashboard_modo_app_preserva_o_parametro_no_login(cliente_com_mongo_falso):
+def test_dashboard_modo_app_sem_login_vai_para_o_ecra_de_entrada_da_app(cliente_com_mongo_falso):
     cliente, _ = cliente_com_mongo_falso
     resposta = cliente.get("/dashboard?modo=app", follow_redirects=False)
-    assert "modo%3Dapp" in resposta.headers["location"]
+    assert resposta.headers["location"] == "/?modo=app"
+
+
+def test_versao_da_api_e_a_do_ficheiro_unico(cliente_com_mongo_falso):
+    from app.versao import VERSAO
+    cliente, _ = cliente_com_mongo_falso
+    assert cliente.get("/api/versao").json() == {"versao": VERSAO}
 
 
 def test_dashboard_com_login_devolve_a_pagina(cliente_com_mongo_falso):
@@ -179,3 +185,12 @@ def test_apagar_conta_remove_o_registo(cliente_com_mongo_falso):
 
     from app.database import get_utilizadores_collection
     assert get_utilizadores_collection().count_documents({}) == 0
+
+
+def test_url_inicio_no_executavel_volta_ao_ecra_de_entrada():
+    assert auth.url_inicio("/dashboard?modo=app") == "/?modo=app"
+
+
+def test_url_inicio_no_site_volta_a_vitrine():
+    assert auth.url_inicio("/dashboard") == "/"
+    assert auth.url_inicio(None) == "/"

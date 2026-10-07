@@ -7,9 +7,54 @@
     <meta name="description" content="Painel pessoal que acompanha vagas de emprego reais e notícias do setor de tecnologia interativa, recolhidas automaticamente.">
     <link rel="icon" type="image/svg+xml" href="/static/logo-mark.svg">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-    <link rel="stylesheet" href="/static/style.css?v=6">
+    <link rel="stylesheet" href="/static/style.css?v=7">
+    <script>
+        // No executável de secretária o endereço traz "?modo=app": o painel
+        // mostra então o aspeto de aplicação (barra lateral) em vez do do site.
+        // Fica guardado na sessão da janela, para sobreviver a redirecionamentos.
+        (function () {
+            try {
+                if (new URLSearchParams(location.search).get("modo") === "app") sessionStorage.setItem("monitor_modo", "app");
+                if (sessionStorage.getItem("monitor_modo") === "app") document.documentElement.classList.add("modo-app");
+            } catch (e) { /* sem sessionStorage: fica o aspeto do site */ }
+        })();
+    </script>
 </head>
 <body>
+    <aside class="trilho-app" aria-label="Navegação da aplicação">
+        <a href="/dashboard?modo=app" class="trilho-marca" title="Monitor"><img src="/static/logo-mark.svg" alt="Monitor"></a>
+        <button type="button" class="trilho-item trilho-item-ativo" data-aba="vagas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Vagas
+            <span class="aba-contador contador-vagas-novas" hidden>0</span>
+        </button>
+        <button type="button" class="trilho-item" data-aba="candidaturas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/></svg>
+            Candid.
+        </button>
+        <button type="button" class="trilho-item" data-aba="noticias">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2"/></svg>
+            Notícias
+        </button>
+        <button type="button" class="trilho-item" data-aba="estatisticas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+            Estatíst.
+        </button>
+        <span class="trilho-versao versao-site">v2.0.0</span>
+    </aside>
+    <div class="barra-app">
+        <h1 class="barra-app-titulo" id="tituloApp">Vagas</h1>
+        <span class="app-estado" id="estadoRobos"><i></i><span id="estadoRobosTexto">A ligar…</span></span>
+        <span class="barra-app-recolha">Última recolha: <b id="ultimaRecolha">—</b></span>
+        <input type="search" class="barra-app-pesquisa" id="pesquisaGeral" placeholder="Pesquisar em tudo…" aria-label="Pesquisar em tudo">
+        <div class="conta-utilizador conta-app" id="contaApp" hidden>
+            <img class="conta-foto" id="contaAppFoto" alt="">
+            <span class="conta-nome" id="contaAppNome"></span>
+            <span class="conta-separador"></span>
+            <a href="/auth/logout?modo=app" class="conta-sair">Sair</a>
+            <button type="button" class="conta-apagar" id="botaoApagarContaApp" title="Apagar a minha conta">Apagar conta</button>
+        </div>
+    </div>
     <header class="topo">
         <div class="container-largo topo-conteudo">
             <a href="/" class="marca" id="linkLogoMonitor">
@@ -19,7 +64,7 @@
             <nav class="abas" role="tablist" aria-label="Secções">
                 <button class="aba aba-ativa" data-aba="vagas" role="tab" aria-selected="true">
                     Vagas
-                    <span class="aba-contador" id="contadorVagasNovas" hidden>0</span>
+                    <span class="aba-contador contador-vagas-novas" id="contadorVagasNovas" hidden>0</span>
                 </button>
                 <button class="aba" data-aba="noticias" role="tab" aria-selected="false">Notícias</button>
                 <button class="aba" data-aba="estatisticas" role="tab" aria-selected="false">Estatísticas</button>
@@ -46,39 +91,49 @@
             if (linkPortfolio) linkPortfolio.remove();
         }
 
-        // Mostra quem entrou com a conta Google, no canto do cabeçalho.
+        // Mostra quem entrou com a conta Google, no canto do cabeçalho (site)
+        // e na barra de cima (aplicação).
         fetch("/api/utilizador-atual")
             .then(function (resposta) { return resposta.ok ? resposta.json() : null; })
             .then(function (utilizador) {
                 if (!utilizador) return;
-                var caixa = document.getElementById("contaUtilizador");
-                var foto = document.getElementById("contaFoto");
-                var nome = document.getElementById("contaNome");
-                if (utilizador.foto) {
-                    foto.src = utilizador.foto;
-                    foto.hidden = false;
-                } else {
-                    foto.hidden = true;
-                }
-                nome.textContent = utilizador.nome || utilizador.email;
-                caixa.hidden = false;
+                var nomeCompleto = utilizador.nome || utilizador.email;
+                [["contaUtilizador", "contaFoto", "contaNome"], ["contaApp", "contaAppFoto", "contaAppNome"]].forEach(function (ids) {
+                    var caixa = document.getElementById(ids[0]);
+                    var foto = document.getElementById(ids[1]);
+                    var nome = document.getElementById(ids[2]);
+                    if (!caixa) return;
+                    if (utilizador.foto) {
+                        foto.src = utilizador.foto;
+                        foto.hidden = false;
+                    } else {
+                        foto.hidden = true;
+                    }
+                    nome.textContent = nomeCompleto;
+                    caixa.hidden = false;
+                });
             })
             .catch(function () { /* se falhar, o cabeçalho só fica sem esta parte */ });
 
         // Direito ao apagamento: remove a conta (nome, email, foto) desta sessão.
         // Não apaga vagas/notícias — essas nunca tiveram dados pessoais.
-        document.getElementById("botaoApagarConta").addEventListener("click", function () {
+        function apagarConta() {
             var confirmar = window.confirm(
                 "Isto apaga a tua conta e os teus dados de login (nome, email, foto). " +
                 "Não podes desfazer. Continuar?"
             );
             if (!confirmar) return;
             fetch("/api/utilizador-atual", { method: "DELETE" })
-                .then(function () { window.location.href = "/"; })
+                .then(function () {
+                    var emApp = document.documentElement.classList.contains("modo-app");
+                    window.location.href = emApp ? "/?modo=app" : "/";
+                })
                 .catch(function () {
                     window.alert("Não foi possível apagar a conta agora. Tenta novamente ou escreve para elisamanueljob@gmail.com.");
                 });
-        });
+        }
+        document.getElementById("botaoApagarConta").addEventListener("click", apagarConta);
+        document.getElementById("botaoApagarContaApp").addEventListener("click", apagarConta);
     </script>
 
     <main class="container-largo">
@@ -164,6 +219,13 @@
             </div>
         </section>
 
+        <section class="painel" data-painel="candidaturas" hidden>
+            <div class="quadro" id="quadroCandidaturas">
+                <p class="estado-vazio">A carregar candidaturas…</p>
+            </div>
+            <p class="quadro-nota">Muda o estado de uma vaga no seletor do cartão e ela passa para a coluna certa. A coluna "Por candidatar" mostra só as primeiras.</p>
+        </section>
+
         <section class="painel" data-painel="noticias" hidden>
             <div class="filtros">
                 <input type="search" id="filtroTextoNoticias" placeholder="Pesquisar notícias…">
@@ -225,7 +287,7 @@
     </main>
 
     <footer class="rodape">
-        <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a> · <a href="/privacidade">Privacidade</a> · v1.9.0</p>
+        <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a> · <a href="/privacidade">Privacidade</a> · <span class="versao-site">v2.0.0</span></p>
     </footer>
 
     <template id="modeloVaga">
@@ -260,7 +322,8 @@
         </article>
     </template>
 
-    <script src="/static/script.js?v=6"></script>
+    <script src="/static/script.js?v=7"></script>
+    <script src="/static/versao.js?v=1" defer></script>
     <script>
         // O logótipo "Monitor" força sempre uma ida a buscar a página nova ao
         // servidor (como um F5), para nunca mostrar uma versão antiga guardada

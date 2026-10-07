@@ -46,6 +46,27 @@ function animarNumero(elemento, valorFinal) {
     requestAnimationFrame(passo);
 }
 
+// Barra de cima da aplicação: estado dos robôs e hora da última recolha.
+function mostrarEstadoRobos(atualizadoEm, falhou) {
+    const caixa = document.getElementById('estadoRobos');
+    const texto = document.getElementById('estadoRobosTexto');
+    const recolha = document.getElementById('ultimaRecolha');
+    if (!caixa || !texto) return;
+    caixa.classList.toggle('app-estado-erro', Boolean(falhou));
+    if (falhou) {
+        texto.textContent = 'Sem ligação ao servidor';
+        return;
+    }
+    texto.textContent = 'Robôs a funcionar';
+    if (recolha && atualizadoEm) {
+        const data = new Date(atualizadoEm);
+        if (!Number.isNaN(data.getTime())) {
+            recolha.textContent = data.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })
+                + ', ' + data.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+}
+
 async function carregarResumo() {
     try {
         const resumo = await pedirJSON('/api/resumo');
@@ -54,8 +75,10 @@ async function carregarResumo() {
         animarNumero(document.getElementById('resumoCandidateiMe'), resumo.vagas_candidatei_me);
         animarNumero(document.getElementById('resumoRespostaRecebida'), resumo.vagas_resposta_recebida);
         animarNumero(document.getElementById('resumoTotalNoticias'), resumo.total_noticias);
+        mostrarEstadoRobos(resumo.atualizado_em);
     } catch (erro) {
         console.error('Não foi possível carregar o resumo', erro);
+        mostrarEstadoRobos(null, true);
     }
 }
 
@@ -313,32 +336,35 @@ function gravarUltimaVisita(valorIso) {
     }
 }
 
+function contadoresVagasNovas() {
+    return document.querySelectorAll('.contador-vagas-novas');
+}
+
 function atualizarContadorVagasNovas(vagas) {
-    const contador = document.getElementById('contadorVagasNovas');
-    if (!contador) return;
+    const contadores = contadoresVagasNovas();
+    if (!contadores.length) return;
 
     const ultimaVisita = lerUltimaVisita();
-    if (!ultimaVisita) {
-        contador.hidden = true;
-        return;
+    let novas = 0;
+    if (ultimaVisita) {
+        const limite = new Date(ultimaVisita).getTime();
+        novas = vagas.filter(
+            (v) => v.publicado_em && new Date(v.publicado_em).getTime() > limite
+        ).length;
     }
-    const limite = new Date(ultimaVisita).getTime();
-    const novas = vagas.filter(
-        (v) => v.publicado_em && new Date(v.publicado_em).getTime() > limite
-    ).length;
-
-    if (novas > 0) {
-        contador.textContent = novas > 99 ? '99+' : String(novas);
-        contador.hidden = false;
-    } else {
-        contador.hidden = true;
-    }
+    contadores.forEach((contador) => {
+        if (novas > 0) {
+            contador.textContent = novas > 99 ? '99+' : String(novas);
+            contador.hidden = false;
+        } else {
+            contador.hidden = true;
+        }
+    });
 }
 
 function marcarVagasComoVistas() {
     gravarUltimaVisita(new Date().toISOString());
-    const contador = document.getElementById('contadorVagasNovas');
-    if (contador) contador.hidden = true;
+    contadoresVagasNovas().forEach((contador) => { contador.hidden = true; });
 }
 
 // ---------- Estatísticas ----------
@@ -600,29 +626,159 @@ function desenharLateralLocalizacoes() {
 
 // ---------- Abas ----------
 
-function configurarAbas() {
-    const abas = document.querySelectorAll('.aba');
-    abas.forEach((aba) => {
-        aba.addEventListener('click', () => {
-            abas.forEach((a) => {
-                a.classList.remove('aba-ativa');
-                a.setAttribute('aria-selected', 'false');
-            });
-            aba.classList.add('aba-ativa');
-            aba.setAttribute('aria-selected', 'true');
+const TITULOS_ABAS = {
+    vagas: 'Vagas',
+    candidaturas: 'Candidaturas',
+    noticias: 'Notícias',
+    estatisticas: 'Estatísticas',
+};
 
-            document.querySelectorAll('.painel').forEach((painel) => {
-                painel.hidden = painel.dataset.painel !== aba.dataset.aba;
-            });
-
-            if (aba.dataset.aba === 'estatisticas') {
-                desenharGraficosEstatisticas();
-            }
-            if (aba.dataset.aba === 'vagas') {
-                marcarVagasComoVistas();
-            }
-        });
+// Muda de secção. Serve tanto as abas do cabeçalho (site) como os botões da
+// barra lateral (aplicação): ambos têm data-aba e ficam sincronizados.
+function mostrarAba(nome) {
+    document.querySelectorAll('.aba').forEach((a) => {
+        const ativa = a.dataset.aba === nome;
+        a.classList.toggle('aba-ativa', ativa);
+        a.setAttribute('aria-selected', String(ativa));
     });
+    document.querySelectorAll('.trilho-item').forEach((item) => {
+        item.classList.toggle('trilho-item-ativo', item.dataset.aba === nome);
+    });
+    document.querySelectorAll('.painel').forEach((painel) => {
+        painel.hidden = painel.dataset.painel !== nome;
+    });
+    const titulo = document.getElementById('tituloApp');
+    if (titulo) titulo.textContent = TITULOS_ABAS[nome] || '';
+
+    if (nome === 'estatisticas') desenharGraficosEstatisticas();
+    if (nome === 'vagas') marcarVagasComoVistas();
+    if (nome === 'candidaturas') carregarQuadro();
+}
+
+function configurarAbas() {
+    document.querySelectorAll('.aba, .trilho-item').forEach((botao) => {
+        botao.addEventListener('click', () => mostrarAba(botao.dataset.aba));
+    });
+}
+
+// ---------- Candidaturas (quadro por estado, só na aplicação) ----------
+
+const COLUNAS_QUADRO = [
+    { estado: 'por_candidatar', titulo: 'Por candidatar', limite: 5 },
+    { estado: 'candidatei_me', titulo: 'Já me candidatei' },
+    { estado: 'resposta_recebida', titulo: 'Com resposta' },
+    { estado: 'arquivada', titulo: 'Arquivada' },
+];
+
+function construirCartaoQuadro(vaga) {
+    const cartao = document.createElement('article');
+    cartao.className = 'cartao-quadro';
+
+    const titulo = document.createElement('h3');
+    const link = document.createElement('a');
+    link.textContent = vaga.titulo;
+    link.href = vaga.link;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    titulo.appendChild(link);
+
+    const detalhe = document.createElement('p');
+    const localizacoes = (vaga.localizacoes || []).join(', ') || 'Localização não indicada';
+    detalhe.textContent = `${vaga.empresa} · ${localizacoes}`;
+
+    const seletor = document.createElement('select');
+    seletor.className = 'seletor-estado';
+    Object.entries(ESTADOS_LABEL).forEach(([valor, rotulo]) => {
+        const opcao = document.createElement('option');
+        opcao.value = valor;
+        opcao.textContent = rotulo;
+        seletor.appendChild(opcao);
+    });
+    seletor.value = vaga.estado;
+    seletor.addEventListener('change', async () => {
+        try {
+            await pedirJSON(`/api/vagas/${vaga.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estado: seletor.value }),
+            });
+            carregarResumo();
+            carregarVagas();
+            carregarQuadro();
+        } catch (erro) {
+            console.error('Não foi possível atualizar o estado da vaga', erro);
+            seletor.value = vaga.estado;
+            alert('Não foi possível guardar esta alteração. Tenta novamente.');
+        }
+    });
+
+    cartao.append(titulo, detalhe, seletor);
+    return cartao;
+}
+
+async function carregarQuadro() {
+    const quadro = document.getElementById('quadroCandidaturas');
+    if (!quadro) return;
+    try {
+        const listas = await Promise.all(
+            COLUNAS_QUADRO.map((coluna) => pedirJSON(`/api/vagas?estado=${coluna.estado}`))
+        );
+        quadro.innerHTML = '';
+        COLUNAS_QUADRO.forEach((coluna, i) => {
+            const vagas = listas[i];
+            const caixa = document.createElement('div');
+            caixa.className = 'quadro-coluna';
+
+            const cabecalho = document.createElement('h2');
+            cabecalho.textContent = coluna.titulo;
+            const total = document.createElement('b');
+            total.textContent = String(vagas.length);
+            cabecalho.appendChild(total);
+            caixa.appendChild(cabecalho);
+
+            const visiveis = coluna.limite ? vagas.slice(0, coluna.limite) : vagas;
+            if (!visiveis.length) {
+                const vazio = document.createElement('p');
+                vazio.className = 'quadro-vazio';
+                vazio.textContent = 'Nenhuma vaga aqui';
+                caixa.appendChild(vazio);
+            }
+            visiveis.forEach((vaga) => caixa.appendChild(construirCartaoQuadro(vaga)));
+
+            if (coluna.limite && vagas.length > coluna.limite) {
+                const mais = document.createElement('button');
+                mais.type = 'button';
+                mais.className = 'quadro-mais';
+                mais.textContent = `Ver as outras ${vagas.length - coluna.limite} na lista`;
+                mais.addEventListener('click', () => {
+                    document.getElementById('filtroEstadoVagas').value = coluna.estado;
+                    mostrarAba('vagas');
+                    carregarVagas();
+                });
+                caixa.appendChild(mais);
+            }
+            quadro.appendChild(caixa);
+        });
+    } catch (erro) {
+        console.error('Não foi possível carregar as candidaturas', erro);
+        quadro.innerHTML = '<p class="estado-vazio">Não foi possível carregar as candidaturas agora.</p>';
+    }
+}
+
+// ---------- Pesquisa geral (barra de cima da aplicação) ----------
+
+function configurarPesquisaGeral() {
+    const campo = document.getElementById('pesquisaGeral');
+    if (!campo) return;
+    campo.addEventListener('input', comAtraso(() => {
+        const aba = document.querySelector('.painel:not([hidden])');
+        const nomeAba = aba ? aba.dataset.painel : 'vagas';
+        const destino = nomeAba === 'noticias' ? 'filtroTextoNoticias' : 'filtroTextoVagas';
+        if (nomeAba !== 'noticias' && nomeAba !== 'vagas') mostrarAba('vagas');
+        const filtro = document.getElementById(destino);
+        filtro.value = campo.value;
+        filtro.dispatchEvent(new Event('input'));
+    }, 250));
 }
 
 // ---------- Filtros (com debounce simples) ----------
@@ -650,6 +806,7 @@ function configurarFiltros() {
 document.addEventListener('DOMContentLoaded', () => {
     configurarAbas();
     configurarFiltros();
+    configurarPesquisaGeral();
     carregarResumo();
     carregarOpcoesVagas();
     carregarOpcoesNoticias();

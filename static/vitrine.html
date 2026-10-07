@@ -7,10 +7,20 @@
 <meta name="description" content="Painel automático que recolhe vagas de emprego reais e notícias do setor de tecnologia interativa todos os dias, sem intervenção manual.">
 <link rel="icon" type="image/svg+xml" href="/static/logo-mark.svg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="/static/vitrine.css?v=3">
+<link rel="stylesheet" href="/static/vitrine.css?v=4">
+<script>
+    // No executável de secretária o endereço traz "?modo=app": mostra o ecrã
+    // de entrada da aplicação em vez da página de apresentação do site.
+    (function () {
+        try {
+            if (new URLSearchParams(location.search).get("modo") === "app") sessionStorage.setItem("monitor_modo", "app");
+            if (sessionStorage.getItem("monitor_modo") === "app") document.documentElement.classList.add("modo-app");
+        } catch (e) { /* sem sessionStorage: fica o site normal */ }
+    })();
+</script>
 </head>
 <body>
-<header class="topo">
+<header class="topo so-site">
     <div class="container topo-conteudo">
         <a href="/" class="marca" id="linkLogoMonitor">
             <img src="/static/logo-mark.svg" alt="">
@@ -20,7 +30,7 @@
     </div>
 </header>
 
-<section class="heroi">
+<section class="heroi so-site">
     <div class="container">
         <span class="heroi-selo"><span class="heroi-ponto"></span> Dados reais · atualizados todos os dias</span>
         <h1>Vagas de emprego e notícias do setor, recolhidas sozinhas todas as manhãs</h1>
@@ -45,7 +55,7 @@
     </div>
 </section>
 
-<section class="bloco container">
+<section class="bloco container so-site">
     <p class="rotulo-secao">Ao vivo</p>
     <h2 class="titulo-secao">O que o robô encontrou mais recentemente</h2>
     <p class="intro-secao">Uma amostra das vagas e notícias mais recentes, tal como estão guardadas na base de dados agora mesmo.</p>
@@ -58,7 +68,7 @@
     <div class="carrossel-pontos" id="carrosselPontos"></div>
 </section>
 
-<section class="bloco container">
+<section class="bloco container so-site">
     <p class="rotulo-secao">Como funciona</p>
     <h2 class="titulo-secao">Sem cliques, sem esquecimentos</h2>
     <p class="intro-secao">O painel completo, com filtros e acompanhamento de candidaturas, fica por trás. Esta vitrine mostra só o essencial: prova de que os dados são mesmo reais.</p>
@@ -81,9 +91,75 @@
     </div>
 </section>
 
-<footer class="rodape">
-    <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a> · <a href="/privacidade">Privacidade</a> · v1.9.0</p>
+<footer class="rodape so-site">
+    <nav class="rodape-links" aria-label="Ligações">
+        <a href="https://elisamanuel-on.github.io/portfolio.html" target="_blank" rel="noopener">Portfólio</a>
+        <a href="https://elisamanuel-on.github.io/" target="_blank" rel="noopener">Site</a>
+        <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a>
+        <a href="/privacidade">Privacidade</a>
+    </nav>
+    <p>Projeto de portfólio — Elisama Manuel · Dados reais, recolhidos automaticamente · <span class="versao-site">v2.0.0</span></p>
 </footer>
+
+<div class="ecra-app" id="ecraApp">
+    <aside class="app-trilho" aria-hidden="true">
+        <a class="app-marca" href="/?modo=app" title="Monitor"><img src="/static/logo-mark.svg" alt=""></a>
+        <span class="app-item app-item-ativo">Início</span>
+        <span class="app-item app-item-bloqueado">Vagas</span>
+        <span class="app-item app-item-bloqueado">Notícias</span>
+        <span class="app-versao versao-site">v2.0.0</span>
+    </aside>
+    <div class="app-corpo">
+        <div class="app-barra">
+            <span class="app-estado" id="appEstado"><i></i><span id="appEstadoTexto">A ligar…</span></span>
+            <span>Última recolha: <b id="appAtualizado">—</b></span>
+            <span class="app-barra-dir">Monitor de Vagas &amp; Notícias</span>
+        </div>
+        <main class="app-principal">
+            <section class="app-boasvindas">
+                <div>
+                    <h1>Bem-vinda ao Monitor</h1>
+                    <p>Entra com a tua conta Google para abrir o painel, com os filtros e o acompanhamento das tuas candidaturas.</p>
+                </div>
+                <a class="app-google" href="/auth/login?destino=%2Fdashboard%3Fmodo%3Dapp">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path fill="#4285F4" d="M23 12.3c0-.8-.1-1.5-.2-2.2H12v4.3h6.2c-.3 1.4-1.1 2.6-2.3 3.4v2.8h3.7c2.2-2 3.4-5 3.4-8.3z"/>
+                        <path fill="#34A853" d="M12 23.5c3.1 0 5.7-1 7.6-2.8l-3.7-2.8c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v2.9C3.7 20.9 7.5 23.5 12 23.5z"/>
+                        <path fill="#FBBC05" d="M5.6 14.3c-.2-.7-.4-1.4-.4-2.3s.1-1.6.4-2.3V6.8H1.8C1 8.4.5 10.1.5 12s.5 3.6 1.3 5.2l3.8-2.9z"/>
+                        <path fill="#EA4335" d="M12 5.2c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.8 15.1.5 12 .5 7.5.5 3.7 3.1 1.8 6.8l3.8 2.9C6.5 7.2 9 5.2 12 5.2z"/>
+                    </svg>
+                    Continuar com Google
+                </a>
+            </section>
+            <section class="app-numeros">
+                <div class="app-numero"><b class="mono" id="appVagas">—</b><span>vagas encontradas</span></div>
+                <div class="app-numero"><b class="mono" id="appNoticias">—</b><span>notícias recolhidas</span></div>
+                <div class="app-numero"><b class="mono">2</b><span>fontes automáticas</span></div>
+                <div class="app-numero"><b class="mono">24 h</b><span>ciclo de recolha</span></div>
+            </section>
+            <section class="app-bloco">
+                <h2>Vagas mais recentes <small>amostra ao vivo</small></h2>
+                <div id="appListaVagas"><p class="app-vazio">A carregar…</p></div>
+            </section>
+            <section class="app-bloco">
+                <h2>Notícias recentes <small>amostra ao vivo</small></h2>
+                <div id="appListaNoticias"><p class="app-vazio">A carregar…</p></div>
+            </section>
+            <p class="app-aviso">Guardamos só o nome, o email e a foto da tua conta Google. <a href="/privacidade">Como e porquê</a></p>
+        </main>
+        <footer class="app-rodape">
+            <nav aria-label="Ligações">
+                <a href="https://elisamanuel-on.github.io/portfolio.html" target="_blank" rel="noopener">Portfólio</a>
+                <a href="https://elisamanuel-on.github.io/" target="_blank" rel="noopener">Site</a>
+                <a href="https://github.com/elisamanuel-on" target="_blank" rel="noopener">GitHub</a>
+                <a href="/privacidade">Privacidade</a>
+            </nav>
+            <span>Elisama Manuel</span>
+        </footer>
+    </div>
+</div>
+
+<script src="/static/versao.js?v=1" defer></script>
 
 <script>
 (function () {
@@ -308,11 +384,48 @@
         });
     }
 
+    // ---------- Ecrã de entrada da aplicação (só no executável) ----------
+
+    function carregarEcraApp() {
+        if (!document.documentElement.classList.contains("modo-app")) return;
+        pedirJSON("/api/resumo").then(function (resumo) {
+            animarNumero(document.getElementById("appVagas"), resumo.total_vagas);
+            animarNumero(document.getElementById("appNoticias"), resumo.total_noticias);
+            document.getElementById("appAtualizado").textContent = formatarHora(resumo.atualizado_em);
+            document.getElementById("appEstadoTexto").textContent = "Robôs a funcionar";
+        }).catch(function () {
+            document.getElementById("appEstado").classList.add("app-estado-erro");
+            document.getElementById("appEstadoTexto").textContent = "Sem ligação ao servidor";
+        });
+        function linha(titulo, detalhe, quando, etiqueta) {
+            return '<div class="app-linha">' +
+                (etiqueta ? '<small>' + escaparHTML(etiqueta) + '</small>' : '') +
+                '<b>' + escaparHTML(titulo) + '</b><span>' + escaparHTML(detalhe) + (quando ? ' · ' + escaparHTML(quando) : '') + '</span></div>';
+        }
+        Promise.all([pedirJSON("/api/vagas?periodo=30d"), pedirJSON("/api/noticias?periodo=30d")]).then(function (dados) {
+            var vagas = dados[0].slice(0, 3), noticias = dados[1].slice(0, 3);
+            document.getElementById("appListaVagas").innerHTML = vagas.length
+                ? vagas.map(function (v) {
+                    return linha(v.titulo || "Vaga sem título",
+                        (v.empresa || "Empresa não indicada") + " · " + ((v.localizacoes || []).join(", ") || "Localização não indicada"),
+                        formatarData(v.publicado_em), "");
+                }).join("")
+                : '<p class="app-vazio">Sem vagas recolhidas nos últimos 30 dias.</p>';
+            document.getElementById("appListaNoticias").innerHTML = noticias.length
+                ? noticias.map(function (n) { return linha(n.titulo || "Notícia sem título", formatarData(n.publicado_em), "", n.fonte || ""); }).join("")
+                : '<p class="app-vazio">Sem notícias recolhidas nos últimos 30 dias.</p>';
+        }).catch(function () {
+            document.getElementById("appListaVagas").innerHTML = '<p class="app-vazio">Não foi possível carregar agora.</p>';
+            document.getElementById("appListaNoticias").innerHTML = '<p class="app-vazio">Não foi possível carregar agora.</p>';
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         carregarStats();
         carregarCarrossel();
         configurarBotaoSistema();
         configurarLogo();
+        carregarEcraApp();
     });
 })();
 </script>

@@ -832,3 +832,188 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
     }
     #listaNoticias { grid-template-columns: 1fr; }
 }
+
+/* =====================================================================
+   Modo aplicação (executável): barra lateral + barra de cima.
+   Só aparece quando o endereço tem ?modo=app (ver o script no <head>);
+   no site normal estes elementos ficam escondidos.
+   ===================================================================== */
+.trilho-app, .barra-app { display: none; }
+
+html.modo-app body { padding-left: 72px; }
+html.modo-app .topo,
+html.modo-app .intro,
+html.modo-app .rodape { display: none; }
+
+html.modo-app .trilho-app {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 72px;
+    z-index: 30;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    background: var(--azul-900);
+    overflow-y: auto;
+}
+
+.trilho-marca { margin-bottom: 10px; }
+.trilho-marca img { width: 34px; height: 34px; display: block; background: #fff; border-radius: 9px; padding: 4px; }
+
+.trilho-item {
+    position: relative;
+    width: 54px;
+    padding: 8px 0;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    color: #9db4d6;
+    font: inherit;
+    font-size: 0.66rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+}
+.trilho-item svg { width: 20px; height: 20px; }
+.trilho-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.trilho-item-ativo, .trilho-item-ativo:hover { background: rgba(255,255,255,.16); color: #fff; }
+.trilho-item:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.trilho-item .aba-contador { position: absolute; top: 1px; right: 4px; min-width: 16px; height: 16px; font-size: 0.6rem; }
+.trilho-versao { margin-top: auto; font: 500 0.6rem "JetBrains Mono", ui-monospace, monospace; color: #9db4d6; }
+
+html.modo-app .barra-app {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 10px 24px;
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borda);
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+.barra-app-titulo { font-size: 1.05rem; margin: 0 6px 0 0; color: var(--texto); }
+.app-estado { display: inline-flex; align-items: center; gap: 7px; color: var(--sucesso); font-weight: 600; }
+.app-estado i { width: 8px; height: 8px; border-radius: 50%; background: var(--sucesso); display: block; }
+.app-estado-erro { color: var(--aviso); }
+.app-estado-erro i { background: var(--aviso); }
+.barra-app-pesquisa {
+    margin-left: auto;
+    width: min(340px, 100%);
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--borda);
+    background: var(--superficie);
+    color: var(--texto);
+}
+.barra-app-pesquisa:focus-visible { outline: 2px solid var(--azul-700); outline-offset: 1px; border-color: var(--azul-700); }
+.conta-app[hidden] { display: none; }
+
+html.modo-app .container-largo { padding-top: 18px; padding-bottom: 8px; }
+html.modo-app .resumo-cards { margin: 0 0 14px; gap: 12px; }
+html.modo-app .card-resumo { padding: 10px 16px; }
+html.modo-app .card-resumo-valor { font-size: 1.4rem; }
+html.modo-app .lateral { top: 76px; }
+html.modo-app .lista { scroll-margin-top: 76px; }
+
+/* Quadro de candidaturas */
+.quadro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 14px;
+    align-items: start;
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+.quadro-coluna {
+    background: #eaeff6;
+    border-radius: var(--raio);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 160px;
+}
+.quadro-coluna h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 2px 4px;
+    font-size: 0.88rem;
+}
+.quadro-coluna h2 b {
+    background: var(--superficie);
+    border-radius: 999px;
+    padding: 0 9px;
+    font: 600 0.75rem "JetBrains Mono", ui-monospace, monospace;
+}
+.cartao-quadro {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+.cartao-quadro:hover { border-color: var(--azul-700); }
+.cartao-quadro h3 { margin: 0; font: 700 0.9rem "Public Sans", sans-serif; }
+.cartao-quadro h3 a { color: var(--texto); text-decoration: none; }
+.cartao-quadro h3 a:hover { color: var(--azul-700); }
+.cartao-quadro p { margin: 2px 0 8px; font-size: 0.82rem; color: var(--texto-suave); }
+.cartao-quadro .seletor-estado { width: 100%; }
+.quadro-vazio {
+    margin: 0;
+    padding: 18px 6px;
+    text-align: center;
+    color: var(--texto-fraco);
+    font-size: 0.82rem;
+    border: 1px dashed var(--borda);
+    border-radius: 12px;
+}
+.quadro-mais {
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--azul-700);
+    background: none;
+    border: 0;
+    padding: 4px;
+    cursor: pointer;
+}
+.quadro-mais:hover { text-decoration: underline; }
+.quadro-nota { color: var(--texto-fraco); font-size: 0.8rem; margin: 12px 0 40px; }
+
+@media (max-width: 700px) {
+    html.modo-app body { padding-left: 0; padding-top: 58px; }
+    html.modo-app .trilho-app {
+        right: 0;
+        bottom: auto;
+        width: auto;
+        height: 58px;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 8px 10px;
+        gap: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .trilho-marca { margin: 0 6px 0 0; }
+    .trilho-item { width: auto; flex-direction: row; padding: 6px 12px; font-size: 0.8rem; flex: none; }
+    .trilho-item svg { display: none; }
+    .trilho-versao { display: none; }
+    html.modo-app .barra-app { top: 58px; padding: 8px 14px; }
+    .barra-app-pesquisa, .barra-app-recolha { display: none; }
+    html.modo-app .lateral { top: 120px; }
+}

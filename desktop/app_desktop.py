@@ -41,7 +41,10 @@ import webview
 
 URL_PAINEL = "https://monitor-vagas-noticias.onrender.com/dashboard?modo=app"
 URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
-VERSAO = "1.9.0"
+URL_VERSAO = "https://monitor-vagas-noticias.onrender.com/api/versao"
+# Valor de reserva: ao abrir, o .exe pergunta ao site qual é a versão atual
+# (ver app/versao.py) e escreve essa no título — assim nunca fica desatualizada.
+VERSAO = "2.0.0"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
 TITULO_JANELA_COM_VERSAO = f"{TITULO_JANELA} — v{VERSAO}"
 TEMPO_LIMITE_SEGUNDOS = 75
@@ -108,12 +111,24 @@ PAGINA_FALHA = """
 """
 
 
+def _atualizar_titulo_com_versao_do_site(janela) -> None:
+    """Põe no título da janela a versão que o site tem agora (a mesma do online)."""
+    try:
+        with urllib.request.urlopen(URL_VERSAO, timeout=10) as resposta:
+            versao_site = json.loads(resposta.read().decode("utf-8")).get("versao")
+        if versao_site:
+            janela.set_title(f"{TITULO_JANELA} — v{versao_site}")
+    except Exception:
+        pass  # fica o título com a versão de reserva
+
+
 def _esperar_e_abrir_painel(janela):
     fim = time.monotonic() + TEMPO_LIMITE_SEGUNDOS
     while time.monotonic() < fim:
         try:
             urllib.request.urlopen(URL_PAINEL, timeout=5)
             janela.load_url(URL_PAINEL)
+            _atualizar_titulo_com_versao_do_site(janela)
             return
         except Exception:
             time.sleep(2)

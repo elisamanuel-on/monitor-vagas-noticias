@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 1.9.0
+**Versão atual:** 2.0.0
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -108,6 +108,14 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v2.0.0
+
+- **Modo aplicação no `.exe`**: a janela de secretária passa a ter aspeto de app, com barra lateral (Vagas, Candidaturas, Notícias, Estatísticas) e barra superior com pesquisa e conta. O site no browser mantém o menu no topo (layout da v1.9.0).
+- **Novo ecrã de entrada no `.exe`**: cartão de boas-vindas com o botão Google, números e exemplos de vagas em direto, e ligações no rodapé para Portfólio, Site, GitHub e Privacidade.
+- **Candidaturas em quadro**: as vagas organizadas por estado (Por candidatar, Já me candidatei, Com resposta, Arquivada).
+- **Versão única**: a versão vive só em `app/versao.py` e é servida em `/api/versao`. O site, o rodapé e o título da janela do `.exe` mostram sempre a mesma versão que está online.
+- Rodapé da vitrine do site com ligações para o Portfólio, Site e GitHub.
 
 ## Novidades na v1.9.0
 

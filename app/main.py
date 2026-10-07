@@ -22,9 +22,10 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.auth import oauth, obter_ou_criar_utilizador, obter_utilizador_opcional
+from app.auth import oauth, obter_ou_criar_utilizador, obter_utilizador_opcional, url_inicio
 from app.database import get_noticias_collection, get_utilizadores_collection, get_vagas_collection
 from app.models import AtualizarEstadoVaga
+from app.versao import VERSAO
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,7 +36,7 @@ app = FastAPI(
         "e notícias reais do setor de tecnologia interativa (RSS), recolhidas "
         "automaticamente todos os dias. Login com conta Google."
     ),
-    version="1.9.0",
+    version=VERSAO,
 )
 
 # A sessão de login fica num cookie assinado com SECRET_KEY — nunca com
@@ -257,6 +258,12 @@ def estatisticas():
     }
 
 
+@app.get("/api/versao")
+def versao():
+    """Versão atual do Monitor (a mesma que aparece no site e no .exe)."""
+    return {"versao": VERSAO}
+
+
 @app.get("/api/utilizador-atual")
 def utilizador_atual(utilizador: Optional[dict] = Depends(obter_utilizador_opcional)):
     """Quem está autenticado nesta sessão, para o frontend mostrar o nome/
@@ -294,26 +301,26 @@ async def auth_login(request: Request, destino: str = "/dashboard"):
 @app.get("/auth/callback", name="auth_callback")
 async def auth_callback(request: Request):
     """Para onde o Google reenvia depois da pessoa autorizar (ou recusar)."""
+    destino = request.session.pop("destino_pos_login", "/dashboard")
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError:
-        # Login recusado ou falhado — volta à vitrine em vez de mostrar um erro técnico.
-        return RedirectResponse(url="/")
+        # Login recusado ou falhado — volta ao início em vez de mostrar um erro técnico.
+        return RedirectResponse(url=url_inicio(destino))
 
     dados_google = token.get("userinfo")
     if not dados_google:
-        return RedirectResponse(url="/")
+        return RedirectResponse(url=url_inicio(destino))
 
     utilizador = obter_ou_criar_utilizador(dados_google)
     request.session["utilizador_id"] = utilizador["id"]
-    destino = request.session.pop("destino_pos_login", "/dashboard")
     return RedirectResponse(url=destino)
 
 
 @app.get("/auth/logout")
-def auth_logout(request: Request):
+def auth_logout(request: Request, modo: Optional[str] = None):
     request.session.clear()
-    return RedirectResponse(url="/")
+    return RedirectResponse(url="/?modo=app" if modo == "app" else "/")
 
 
 # Frontend estático (tem de vir depois das rotas /api/... para não as tapar)
@@ -324,8 +331,12 @@ _SEM_CACHE = {"Cache-Control": "no-cache"}
 
 
 @app.get("/")
-def raiz():
-    """Vitrine pública: apresentação do projeto com dados reais em destaque."""
+def raiz(request: Request, utilizador: Optional[dict] = Depends(obter_utilizador_opcional)):
+    """Vitrine pública: apresentação do projeto com dados reais em destaque.
+    No executável de secretária (?modo=app) mostra o ecrã de entrada da
+    aplicação; e se a pessoa já tem sessão iniciada, salta direto para o painel."""
+    if request.query_params.get("modo") == "app" and utilizador:
+        return RedirectResponse(url="/dashboard?modo=app")
     return FileResponse(str(BASE_DIR / "static" / "vitrine.html"), headers=_SEM_CACHE)
 
 
@@ -334,6 +345,9 @@ def painel(request: Request, utilizador: Optional[dict] = Depends(obter_utilizad
     """Painel de trabalho completo — exige login com conta Google."""
     if not utilizador:
         modo = request.query_params.get("modo")
+        if modo == "app":
+            # No executável, primeiro mostra o ecrã de entrada (o botão do Google está lá).
+            return RedirectResponse(url="/?modo=app")
         destino = "/dashboard" + (f"?modo={modo}" if modo else "")
         return RedirectResponse(url=f"/auth/login?destino={quote(destino)}")
     return FileResponse(str(BASE_DIR / "static" / "index.html"), headers=_SEM_CACHE)
