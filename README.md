@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 2.0.3
+**Versão atual:** 2.0.4
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -108,6 +108,10 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v2.0.4
+
+- No site (browser), o rodapé da página inicial deixa de ter o link "Site" (apontava para a própria página). O link "Site" só existe no ecrã de entrada do `.exe`, onde abre `monitor-vagas-noticias.onrender.com`.
 
 ## Novidades na v2.0.3
 

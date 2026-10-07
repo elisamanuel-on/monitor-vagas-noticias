@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias — versão de secretária
 
-**Versão atual:** 2.0.3 (aparece no título da janela e no ecrã de espera ao abrir)
+**Versão atual:** 2.0.4 (aparece no título da janela e no ecrã de espera ao abrir)
 
 A versão é definida num só sítio, `app/versao.py`, e o site serve-a em `/api/versao`. O `.exe` só guarda uma cópia de reserva (usada no ecrã de espera, antes de o site responder) e, depois de carregar, atualiza o título da janela com a versão que está online — por isso o `.exe` e o site mostram sempre a mesma versão.
 
