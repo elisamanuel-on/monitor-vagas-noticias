@@ -539,10 +539,63 @@ function desenharGraficosEstatisticas() {
 async function carregarEstatisticas() {
     try {
         ultimosDadosEstatisticas = await pedirJSON('/api/estatisticas');
+        desenharLateralLocalizacoes();
         desenharGraficosEstatisticas();
     } catch (erro) {
         console.error('Não foi possível carregar as estatísticas', erro);
     }
+}
+
+// ---------- Painel lateral (notícias do setor + localizações) ----------
+
+async function carregarLateralNoticias() {
+    const contentor = document.getElementById('lateralNoticias');
+    if (!contentor) return;
+    try {
+        const noticias = await pedirJSON('/api/noticias');
+        contentor.innerHTML = '';
+        if (!noticias.length) {
+            contentor.innerHTML = '<p class="estado-vazio">Ainda não há notícias.</p>';
+            return;
+        }
+        noticias.slice(0, 5).forEach((noticia) => {
+            const item = document.createElement('article');
+            item.className = 'lateral-noticia';
+            const fonte = document.createElement('small');
+            fonte.textContent = noticia.fonte;
+            const link = document.createElement('a');
+            link.textContent = noticia.titulo;
+            link.href = noticia.link;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            const data = document.createElement('span');
+            data.textContent = formatarData(noticia.publicado_em);
+            item.append(fonte, link, data);
+            contentor.appendChild(item);
+        });
+    } catch (erro) {
+        console.error('Não foi possível carregar as notícias do painel lateral', erro);
+        contentor.innerHTML = '<p class="estado-vazio">Não foi possível carregar as notícias.</p>';
+    }
+}
+
+function desenharLateralLocalizacoes() {
+    const contentor = document.getElementById('lateralLocalizacoes');
+    if (!contentor || !ultimosDadosEstatisticas) return;
+    const dados = (ultimosDadosEstatisticas.por_localizacao || []).slice(0, 5);
+    if (!dados.length) {
+        contentor.innerHTML = '<p class="estado-vazio">Ainda não há dados suficientes.</p>';
+        return;
+    }
+    const maior = Math.max(1, ...dados.map((d) => d.total));
+    contentor.innerHTML = dados
+        .map((d) => `
+            <div class="lateral-barra">
+                <span>${escaparHtml(String(d.chave))} <b>${d.total}</b></span>
+                <i style="width:${Math.max(4, Math.round((d.total / maior) * 100))}%"></i>
+            </div>
+        `)
+        .join('');
 }
 
 // ---------- Abas ----------
@@ -602,6 +655,11 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarOpcoesNoticias();
     carregarEstatisticas();
     carregarNoticias();
+    carregarLateralNoticias();
+    document.getElementById('verTodasNoticias').addEventListener('click', () => {
+        document.querySelector('.aba[data-aba="noticias"]').click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     carregarVagas().then(() => {
         // Dá um instante para reparar no número de vagas novas antes de as

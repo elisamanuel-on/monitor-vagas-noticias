@@ -35,7 +35,7 @@ app = FastAPI(
         "e notícias reais do setor de tecnologia interativa (RSS), recolhidas "
         "automaticamente todos os dias. Login com conta Google."
     ),
-    version="1.8.1",
+    version="1.9.0",
 )
 
 # A sessão de login fica num cookie assinado com SECRET_KEY — nunca com

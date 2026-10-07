@@ -45,15 +45,25 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .topo {
     background: var(--superficie);
     border-bottom: 1px solid var(--borda);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+/* Largura total, com margens laterais pequenas (o painel aproveita o ecrã todo) */
+.container-largo {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 28px;
 }
 
 .topo-conteudo {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
+    padding: 12px 28px;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 8px 24px;
 }
 
 .marca {
@@ -83,6 +93,7 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .link-portfolio:hover { color: var(--azul-700); border-bottom-color: var(--azul-700); }
 
 .topo-direita {
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -163,26 +174,26 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .pagina-texto a { color: var(--azul-700); }
 
 .intro {
-    padding: 40px 0 8px;
+    padding: 24px 0 4px;
 }
 
 .intro h1 {
     margin: 0 0 10px;
-    font-size: 2rem;
+    font-size: 1.7rem;
     letter-spacing: -0.01em;
 }
 
 .intro-texto {
     color: var(--texto-suave);
-    max-width: 62ch;
+    max-width: 90ch;
     margin: 0;
 }
 
 .resumo-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin: 28px 0;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin: 18px 0 22px;
 }
 
 .card-resumo {
@@ -215,9 +226,7 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 
 .abas {
     display: flex;
-    gap: 4px;
-    border-bottom: 1px solid var(--borda);
-    margin-bottom: 20px;
+    gap: 6px;
 }
 
 .aba {
@@ -227,21 +236,21 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
     appearance: none;
     background: none;
     border: none;
-    border-bottom: 2px solid transparent;
-    padding: 10px 4px;
-    margin-right: 20px;
+    border-radius: 10px;
+    padding: 8px 14px;
     font-size: 0.95rem;
     font-weight: 600;
+    font-family: inherit;
     color: var(--texto-suave);
     cursor: pointer;
-    transition: color .15s ease, border-color .15s ease;
+    transition: color .15s ease, background .15s ease;
 }
 
-.aba:hover { color: var(--azul-700); }
+.aba:hover { color: var(--azul-700); background: var(--fundo); }
 
 .aba-ativa, .aba-ativa:hover {
     color: var(--azul-700);
-    border-bottom-color: var(--azul-700);
+    background: var(--azul-suave);
 }
 
 .aba-contador {
@@ -290,11 +299,108 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
     min-width: 200px;
 }
 
+.filtros-vagas {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) repeat(5, minmax(0, 1fr));
+}
+
+.filtros-vagas input[type="search"] { min-width: 0; }
+.filtros-vagas select { min-width: 0; width: 100%; }
+
 .lista {
     display: grid;
     gap: 12px;
     padding-bottom: 60px;
+    scroll-margin-top: 84px;
 }
+
+/* Vagas à esquerda, notícias e localizações à direita */
+.duas-colunas {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 20px;
+    align-items: start;
+}
+
+.lateral {
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.lateral-bloco {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    padding: 16px;
+    box-shadow: var(--sombra);
+}
+
+.lateral-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 12px;
+    font-size: 1rem;
+}
+
+.lateral-ver-todas {
+    font: inherit;
+    font-family: "Public Sans", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--azul-700);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.lateral-ver-todas:hover { text-decoration: underline; }
+
+.lateral-noticias { display: flex; flex-direction: column; gap: 8px; }
+
+.lateral-noticia {
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.lateral-noticia small {
+    display: block;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--acento);
+}
+
+.lateral-noticia a {
+    display: block;
+    margin: 3px 0;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--texto);
+    text-decoration: none;
+}
+
+.lateral-noticia a:hover { color: var(--azul-700); }
+.lateral-noticia span { font-size: 0.78rem; color: var(--texto-fraco); }
+
+.lateral-barras { display: flex; flex-direction: column; gap: 10px; }
+.lateral-barra span { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--texto-suave); }
+.lateral-barra b { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 500; color: var(--texto); }
+.lateral-barra i { display: block; height: 7px; border-radius: 6px; background: var(--azul-700); margin-top: 4px; }
+
+/* Notícias: várias colunas quando há espaço */
+#listaNoticias {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+}
+
+#listaNoticias .paginacao { grid-column: 1 / -1; }
 
 .estado-vazio {
     color: var(--texto-suave);
@@ -317,6 +423,42 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 .cartao-vaga:hover, .cartao-noticia:hover {
     border-color: var(--azul-700);
 }
+
+/* Cartão de vaga em linha: texto à esquerda, ações à direita */
+#listaVagas .cartao-vaga {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 20px;
+    row-gap: 2px;
+    align-items: center;
+    padding: 14px 18px;
+}
+
+#listaVagas .cartao-vaga-cabecalho,
+#listaVagas .cartao-vaga-meta,
+#listaVagas .cartao-vaga-detalhes { grid-column: 1; }
+
+#listaVagas .cartao-vaga-detalhes { margin: 4px 0 0; }
+#listaVagas .cartao-vaga-cabecalho { justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 4px 12px; }
+
+#listaVagas .cartao-vaga-rodape {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cartao-vaga-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+}
+
+.cartao-vaga-meta .cartao-vaga-empresa { margin: 2px 0; }
+.cartao-vaga-meta .etiqueta-fonte { margin-bottom: 0; }
 
 .cartao-vaga-cabecalho {
     display: flex;
@@ -661,4 +803,32 @@ h1, h2, h3 { font-family: "Lexend", "Public Sans", sans-serif; }
 @media (max-width: 520px) {
     .paginacao-botao { padding: 8px 12px; font-size: 0.9rem; }
     .paginacao-info small { display: none; }
+}
+
+@media (max-width: 1100px) {
+    .duas-colunas { grid-template-columns: 1fr; }
+    .lateral { position: static; }
+    .filtros-vagas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .filtros-vagas input[type="search"] { grid-column: 1 / -1; }
+}
+
+@media (max-width: 900px) {
+    .abas { order: 3; width: 100%; overflow-x: auto; }
+    .topo-conteudo { gap: 8px 16px; }
+}
+
+@media (max-width: 700px) {
+    .container-largo { padding: 0 14px; }
+    .topo-conteudo { padding: 10px 14px; }
+    .link-portfolio { display: none; }
+    #listaVagas .cartao-vaga { grid-template-columns: 1fr; }
+    #listaVagas .cartao-vaga-rodape {
+        grid-column: 1;
+        grid-row: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+    #listaNoticias { grid-template-columns: 1fr; }
 }

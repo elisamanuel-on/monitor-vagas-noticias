@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 1.8.1
+**Versão atual:** 1.9.0
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -108,6 +108,13 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v1.9.0
+
+- **Novo layout do painel, a usar a largura toda do ecrã**: o menu (Vagas, Notícias, Estatísticas) passou para o cabeçalho fixo, os 5 números do resumo ficam numa só linha e os filtros das vagas também.
+- **Vagas em linhas largas**, com título, empresa, estado e localização à esquerda e "Ver vaga" e o seletor de estado à direita.
+- **Painel lateral** junto às vagas, com as 5 notícias mais recentes do setor (e "Ver todas") e as localizações com mais vagas.
+- A aba Notícias passa a mostrar os cartões em várias colunas. Em ecrãs pequenos tudo volta a uma só coluna.
 
 ## Novidades na v1.8.1
 
