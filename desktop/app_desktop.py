@@ -42,11 +42,12 @@ import webview
 URL_PAINEL = "https://monitor-vagas-noticias.onrender.com/dashboard?modo=app"
 URL_RESUMO = "https://monitor-vagas-noticias.onrender.com/api/resumo"
 URL_VERSAO = "https://monitor-vagas-noticias.onrender.com/api/versao"
-# Valor de reserva: ao abrir, o .exe pergunta ao site qual é a versão atual
-# (ver app/versao.py) e escreve essa no título — assim nunca fica desatualizada.
-VERSAO = "2.0.4"
+# Valor de reserva, só para a primeira vez que o .exe abre (sem internet e sem
+# nada guardado). A versão verdadeira é a do site (app/versao.py): o .exe
+# guarda a última que viu online e mostra-a logo ao abrir, e atualiza-a assim
+# que o site responder — por isso o .exe e o site mostram sempre a mesma.
+VERSAO = "2.0.5"
 TITULO_JANELA = "Monitor de Vagas & Notícias"
-TITULO_JANELA_COM_VERSAO = f"{TITULO_JANELA} — v{VERSAO}"
 TEMPO_LIMITE_SEGUNDOS = 75
 INTERVALO_VERIFICACAO_SEGUNDOS = 15 * 60
 
@@ -80,11 +81,20 @@ PAGINA_ESPERA = """
     <div class="anel"></div>
     <h1>A ligar ao Monitor de Vagas & Notícias…</h1>
     <p>Pode demorar um pouco na primeira vez do dia.</p>
-    <p class="versao">v{VERSAO}</p>
+    <p class="versao" id="versao">v{VERSAO}</p>
   </div>
 </body>
 </html>
-""".replace("{VERSAO}", VERSAO)
+"""
+
+
+def _pagina_espera(versao: str) -> str:
+    return PAGINA_ESPERA.replace("{VERSAO}", versao)
+
+
+def _titulo_com_versao(versao: str) -> str:
+    return f"{TITULO_JANELA} — v{versao}"
+
 
 PAGINA_FALHA = """
 <!DOCTYPE html>
@@ -111,24 +121,38 @@ PAGINA_FALHA = """
 """
 
 
-def _atualizar_titulo_com_versao_do_site(janela) -> None:
-    """Põe no título da janela a versão que o site tem agora (a mesma do online)."""
+def _obter_versao_do_site():
+    """Pergunta ao site qual é a versão atual. Levanta erro se ele não responder."""
+    with urllib.request.urlopen(URL_VERSAO, timeout=5) as resposta:
+        versao = json.loads(resposta.read().decode("utf-8")).get("versao")
+    if not versao:
+        raise ValueError("o site não devolveu a versão")
+    return str(versao)
+
+
+def _mostrar_versao(janela, versao: str) -> None:
+    """Põe a versão no título da janela e, se ainda estiver à vista, no ecrã de espera."""
     try:
-        with urllib.request.urlopen(URL_VERSAO, timeout=10) as resposta:
-            versao_site = json.loads(resposta.read().decode("utf-8")).get("versao")
-        if versao_site:
-            janela.set_title(f"{TITULO_JANELA} — v{versao_site}")
+        janela.set_title(_titulo_com_versao(versao))
     except Exception:
-        pass  # fica o título com a versão de reserva
+        pass
+    try:
+        janela.evaluate_js(
+            "var e=document.getElementById('versao'); if(e){e.textContent='v'+%s;}" % json.dumps(versao)
+        )
+    except Exception:
+        pass
 
 
 def _esperar_e_abrir_painel(janela):
     fim = time.monotonic() + TEMPO_LIMITE_SEGUNDOS
     while time.monotonic() < fim:
         try:
+            versao_site = _obter_versao_do_site()
+            _gravar_estado(versao=versao_site)
+            _mostrar_versao(janela, versao_site)
             urllib.request.urlopen(URL_PAINEL, timeout=5)
             janela.load_url(URL_PAINEL)
-            _atualizar_titulo_com_versao_do_site(janela)
             return
         except Exception:
             time.sleep(2)
@@ -147,19 +171,35 @@ def _pasta_dados_locais() -> Path:
 FICHEIRO_ESTADO_LOCAL = _pasta_dados_locais() / "estado_local.json"
 
 
-def _ler_total_vagas_conhecido():
+def _ler_estado() -> dict:
     try:
         dados = json.loads(FICHEIRO_ESTADO_LOCAL.read_text(encoding="utf-8"))
-        return dados.get("total_vagas")
+        return dados if isinstance(dados, dict) else {}
     except Exception:
-        return None
+        return {}
+
+
+def _gravar_estado(**campos) -> None:
+    try:
+        estado = _ler_estado()
+        estado.update(campos)
+        FICHEIRO_ESTADO_LOCAL.write_text(json.dumps(estado), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _ler_total_vagas_conhecido():
+    return _ler_estado().get("total_vagas")
 
 
 def _gravar_total_vagas_conhecido(total: int) -> None:
-    try:
-        FICHEIRO_ESTADO_LOCAL.write_text(json.dumps({"total_vagas": total}), encoding="utf-8")
-    except Exception:
-        pass
+    _gravar_estado(total_vagas=total)
+
+
+def _versao_para_mostrar_ao_abrir() -> str:
+    """A última versão que o .exe viu online; se for a primeira vez, a de reserva."""
+    versao = _ler_estado().get("versao")
+    return str(versao) if versao else VERSAO
 
 
 def _notificar_vagas_novas(novas: int, janela) -> None:
@@ -201,9 +241,10 @@ def _verificar_vagas_novas_periodicamente(janela) -> None:
 
 
 def principal():
+    versao_inicial = _versao_para_mostrar_ao_abrir()
     janela = webview.create_window(
-        title=TITULO_JANELA_COM_VERSAO,
-        html=PAGINA_ESPERA,
+        title=_titulo_com_versao(versao_inicial),
+        html=_pagina_espera(versao_inicial),
         width=1280,
         height=860,
         min_size=(960, 640),

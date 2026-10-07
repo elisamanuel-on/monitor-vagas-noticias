@@ -1,8 +1,8 @@
 # Monitor de Vagas & Notícias — versão de secretária
 
-**Versão atual:** 2.0.4 (aparece no título da janela e no ecrã de espera ao abrir)
+**Versão atual:** 2.0.5 (aparece no título da janela e no ecrã de espera ao abrir)
 
-A versão é definida num só sítio, `app/versao.py`, e o site serve-a em `/api/versao`. O `.exe` só guarda uma cópia de reserva (usada no ecrã de espera, antes de o site responder) e, depois de carregar, atualiza o título da janela com a versão que está online — por isso o `.exe` e o site mostram sempre a mesma versão.
+A versão é definida num só sítio, `app/versao.py`, e o site serve-a em `/api/versao`. O `.exe` guarda a última versão que viu online (no ficheiro de estado local) e mostra-a logo ao abrir, no título e no ecrã de espera; assim que o site responde, atualiza-a para a versão atual. A versão escrita em `app_desktop.py` só serve na primeira vez que o `.exe` abre, sem nada guardado — por isso o `.exe` e o site mostram sempre a mesma versão.
 
 Desde a v1.7.0 que o `/dashboard` exige login com conta Google — ao abrir, o `.exe` mostra o ecrã de login do Google dentro da própria janela (não é preciso confirmar nada de especial na primeira abertura). Isto ainda não foi testado numa build real do `.exe`; se o login não aparecer corretamente dentro da janela, avisa para investigarmos.
 

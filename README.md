@@ -1,6 +1,6 @@
 # Monitor de Vagas & Notícias
 
-**Versão atual:** 2.0.4
+**Versão atual:** 2.0.5
 
 Painel que acompanha, todos os dias e automaticamente:
 
@@ -108,6 +108,10 @@ Os testes usam respostas simuladas da API da ITJobs e do feed RSS (não fazem pe
 
 - **Robô de recolha**: corre automaticamente via GitHub Actions (`.github/workflows/scraper.yml`), todos os dias às 07:00 UTC, ou manualmente a partir do separador "Actions" do repositório ("Run workflow").
 - **Dashboard**: `render.yaml` configura o deploy no [Render](https://render.com) (plano gratuito), a correr a cada push para `main`.
+
+## Novidades na v2.0.5
+
+- **`.exe` mostra logo a versão certa ao abrir**: guarda a última versão que viu online e mostra-a no título e no ecrã "A ligar…" logo no arranque; assim que o site responde, atualiza-a para a versão atual. Esta alteração está no código do `.exe`, por isso é preciso recompilá-lo uma vez.
 
 ## Novidades na v2.0.4
 

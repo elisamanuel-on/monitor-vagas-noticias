@@ -7,4 +7,4 @@
   - o executável de secretária (.exe) vai buscá-lo ao site e escreve-o no título
     da janela, por isso o .exe nunca fica com um número diferente do online.
 """
-VERSAO = "2.0.4"
+VERSAO = "2.0.5"
